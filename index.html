@@ -1,261 +1,103 @@
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SG Brietlingen-Adendorf Scoreboard</title>
-
+<title>SG Brietlingen-Adendorf – Live-Spielstand</title>
 <style>
 * { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; font-family: Arial, sans-serif; }
+body { background: transparent; }
 
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
+/* Öffentliche Anzeige für PRISM */
+#display {
+  position: relative;
+  width: 100vw;
+  max-width: 100%;
+  margin: 0 auto;
+  line-height: 0;
   background: transparent;
 }
-
-#display {
-  width: 100%;
-  min-height: 100vh;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 25px 2%;
-}
-
-.banner {
-  width: 100%;
-  max-width: 1500px;
-  min-height: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 18px;
-  color: white;
-  background: rgba(5, 13, 27, 0.88);
-  border: 3px solid #00dfff;
-  border-radius: 22px;
-  box-shadow:
-    0 0 8px #00dfff,
-    0 0 20px rgba(0, 223, 255, 0.6),
-    inset 0 0 14px rgba(0, 223, 255, 0.15);
-}
-
-.live {
-  flex-shrink: 0;
-  background: #ed1725;
-  color: white;
-  font-size: clamp(13px, 2vw, 25px);
-  font-weight: 900;
-  font-style: italic;
-  padding: 9px 14px;
-  border-radius: 10px;
-  box-shadow: 0 0 12px rgba(255, 0, 0, 0.6);
-}
-
-.team {
-  flex: 1;
-  min-width: 0;
+#overlayArt { display: block; width: 100%; height: auto; }
+.score-number {
+  position: absolute;
+  top: 50.7%;
+  transform: translate(-50%, -50%);
+  width: 6.2%;
   text-align: center;
-  font-size: clamp(13px, 2.5vw, 30px);
-  font-weight: 800;
-  font-style: italic;
-  text-shadow: 0 0 8px #00cfff;
-  white-space: nowrap;
-}
-
-.score {
-  flex-shrink: 0;
-  width: clamp(42px, 7vw, 90px);
-  height: clamp(42px, 7vw, 70px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #101827;
-  background: white;
-  border: 3px solid #b8f7ff;
-  border-radius: 12px;
-  font-size: clamp(22px, 4vw, 43px);
+  color: #102033;
+  font-size: clamp(18px, 4.5vw, 76px);
+  line-height: 1;
   font-weight: 900;
-  box-shadow: 0 0 12px #00dfff;
+  font-family: Arial, sans-serif;
+  text-shadow: 0 1px 1px rgba(255,255,255,.45);
+  font-variant-numeric: tabular-nums;
 }
+#homeDisplay { left: 38.3%; }
+#guestDisplay { left: 55.0%; }
 
-.crest {
-  flex-shrink: 0;
-  width: clamp(65px, 10vw, 120px);
-  height: clamp(65px, 10vw, 120px);
-  border-radius: 50%;
-  border: 4px solid #00dfff;
-  background: radial-gradient(circle, #087eae, #06172b 75%);
-  box-shadow: 0 0 15px #00dfff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  color: white;
-  font-weight: 900;
-  line-height: 1.1;
-}
-
-.crest .shuttle {
-  font-size: clamp(22px, 4vw, 42px);
-}
-
-.crest .club {
-  font-size: clamp(8px, 1.2vw, 13px);
-  letter-spacing: 1px;
-}
-
-#control {
-  display: none;
-  min-height: 100vh;
-  background: #101827;
-  color: white;
-  padding: 25px;
-  text-align: center;
-}
-
-#login {
-  max-width: 420px;
-  margin: 50px auto;
-}
-
-#login input {
-  display: block;
-  width: 100%;
-  padding: 15px;
-  margin: 12px 0;
-  border-radius: 10px;
-  border: 1px solid #526176;
-  font-size: 17px;
-}
-
-#login button {
-  width: 100%;
-  background: #168cff;
-  color: white;
-  font-size: 18px;
-}
-
+/* Steuerungsseite */
+#control { display: none; min-height: 100vh; background: #101827; color: #fff; padding: 24px 16px; text-align: center; }
+#login, #controlPanel { max-width: 520px; margin: 42px auto; }
+#login input { display: block; width: 100%; padding: 16px; margin: 14px 0; border-radius: 12px; border: 1px solid #526176; font-size: 17px; }
+button { border: 0; border-radius: 14px; padding: 15px 24px; font-size: 22px; font-weight: bold; margin: 5px; cursor: pointer; }
+#login button, .plus { background: #168cff; color: white; }
+.minus, .reset, .logout { background: #303d50; color: white; }
+#login button { width: 100%; font-size: 18px; }
 #controlPanel { display: none; }
-
-#control h1 { font-size: 25px; }
-
-.teams {
-  display: flex;
-  justify-content: space-around;
-  gap: 15px;
-}
-
-.teamControl { flex: 1; }
-
-.controlScore {
-  font-size: 65px;
-  font-weight: bold;
-  margin: 18px 0;
-}
-
-button {
-  border: 0;
-  border-radius: 14px;
-  padding: 15px 25px;
-  font-size: 28px;
-  font-weight: bold;
-  margin: 5px;
-}
-
-.plus { background: #168cff; color: white; }
-.minus { background: #303d50; color: white; }
-
-.reset, .logout {
-  margin-top: 25px;
-  font-size: 16px;
-  background: #303d50;
-  color: white;
-}
-
-#status {
-  font-size: 13px;
-  color: #aab6c8;
-}
-
-#error {
-  color: #ff7777;
-  font-size: 14px;
-}
-
-@media (max-width: 600px) {
-  #display { padding: 12px 1%; }
-  .banner { gap: 5px; padding: 7px 5px; border-width: 2px; }
-  .live { padding: 7px 8px; }
-  .team { font-size: clamp(10px, 2.6vw, 16px); }
-  .score { border-width: 2px; border-radius: 8px; }
+#control h1 { font-size: 28px; }
+.teams { display: flex; justify-content: space-around; gap: 14px; }
+.team { flex: 1; min-width: 0; }
+.score { font-size: 64px; font-weight: bold; margin: 18px 0; }
+.team button { min-width: 64px; }
+.reset { margin-top: 30px; font-size: 16px; }
+.logout { margin-top: 14px; font-size: 15px; }
+#status { font-size: 14px; color: #aab6c8; }
+#error { color: #ff7777; font-size: 14px; overflow-wrap: anywhere; }
+@media (max-width: 420px) {
+  #control { padding: 20px 10px; }
+  .score { font-size: 54px; }
+  .team button { min-width: 54px; padding: 13px 18px; }
 }
 </style>
 </head>
-
 <body>
 
-<div id="display">
-  <div class="banner">
-    <div class="live">● LIVE</div>
-
-    <div class="team">SG Brietlingen-Adendorf</div>
-    <div class="score" id="homeDisplay">0</div>
-
-    <div class="crest">
-      <div class="club">SG BRIETLINGEN</div>
-      <div class="shuttle">🏸</div>
-      <div class="club">ADENDORF</div>
-    </div>
-
-    <div class="score" id="guestDisplay">0</div>
-    <div class="team">BSG Wallhöfen/Ihlpohl</div>
-  </div>
+<div id="display" aria-label="Live-Spielstand SG Brietlingen-Adendorf gegen BSG Wallhöfen/Ihlpohl">
+  <img id="overlayArt" src="assets/scoreboard-overlay.png" alt="SG Brietlingen-Adendorf gegen BSG Wallhöfen/Ihlpohl – Live">
+  <span class="score-number" id="homeDisplay">0</span>
+  <span class="score-number" id="guestDisplay">0</span>
 </div>
 
 <div id="control">
   <div id="login">
     <h1>Scoreboard Login</h1>
     <p>Bitte melde dich an, um den Spielstand zu steuern.</p>
-
     <form id="loginForm">
-      <input id="email" type="email"
-        placeholder="E-Mail-Adresse" required>
-      <input id="password" type="password"
-        placeholder="Passwort" required>
+      <input id="email" type="email" placeholder="E-Mail-Adresse" autocomplete="username" required>
+      <input id="password" type="password" placeholder="Passwort" autocomplete="current-password" required>
       <button type="submit">Anmelden</button>
     </form>
-
     <p id="error"></p>
   </div>
 
   <div id="controlPanel">
-    <h1>Mannschaftsspielstand steuern</h1>
-
+    <h1>Spielstand steuern</h1>
     <div class="teams">
-      <div class="teamControl">
-        <h3>SG Brietlingen-Adendorf</h3>
-        <div class="controlScore" id="homeControl">0</div>
+      <div class="team">
+        <h3>Heim</h3>
+        <div class="score" id="homeControl">0</div>
         <button class="minus" onclick="changeScore('home',-1)">−</button>
         <button class="plus" onclick="changeScore('home',1)">+</button>
       </div>
-
-      <div class="teamControl">
-        <h3>BSG Wallhöfen/Ihlpohl</h3>
-        <div class="controlScore" id="guestControl">0</div>
+      <div class="team">
+        <h3>Gast</h3>
+        <div class="score" id="guestControl">0</div>
         <button class="minus" onclick="changeScore('guest',-1)">−</button>
         <button class="plus" onclick="changeScore('guest',1)">+</button>
       </div>
     </div>
-
-    <button class="reset" onclick="resetScore()">
-      Spielstand zurücksetzen
-    </button>
-
+    <button class="reset" onclick="resetScore()">Spielstand zurücksetzen</button>
     <p id="status">Verbunden</p>
     <button class="logout" onclick="logout()">Abmelden</button>
   </div>
@@ -264,7 +106,6 @@ button {
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyDhYBRhGo3jlKSjullTBQaprgaoSPA7dXk",
@@ -275,65 +116,45 @@ const firebaseConfig = {
   messagingSenderId: "257689447899",
   appId: "1:257689447899:web:37fd7d47ff7c5e0eae4bfe"
 };
-
 const allowedUID = "NWl3lBL8XEZBiQKniVsIXiKsHB73";
+const isControl = new URLSearchParams(location.search).get("control") === "1";
 
-const isControl =
-  new URLSearchParams(location.search).get("control") === "1";
+if (isControl) {
+  document.getElementById("display").style.display = "none";
+  document.getElementById("control").style.display = "block";
+}
 
 firebase.initializeApp(firebaseConfig);
-
 const auth = firebase.auth();
 const db = firebase.database();
 const scoreRef = db.ref("matches/badminton1");
-
-const display = document.getElementById("display");
-const control = document.getElementById("control");
 const login = document.getElementById("login");
 const controlPanel = document.getElementById("controlPanel");
 
 function updateScore(score) {
   const home = score.home ?? 0;
   const guest = score.guest ?? 0;
-
   document.getElementById("homeDisplay").textContent = home;
   document.getElementById("guestDisplay").textContent = guest;
   document.getElementById("homeControl").textContent = home;
   document.getElementById("guestControl").textContent = guest;
 }
 
-// Öffentliche Anzeige für PRISM
 if (!isControl) {
-  scoreRef.on("value", snapshot => {
-    updateScore(snapshot.val() || {home: 0, guest: 0});
-  });
+  scoreRef.on("value", snapshot => updateScore(snapshot.val() || {home: 0, guest: 0}));
 }
 
-// Steuerungsseite
 if (isControl) {
-  display.style.display = "none";
-  control.style.display = "block";
-
   auth.onAuthStateChanged(async user => {
     if (user && user.uid === allowedUID) {
       login.style.display = "none";
       controlPanel.style.display = "block";
-
       document.getElementById("status").textContent = "Verbunden";
-
       const snapshot = await scoreRef.once("value");
-
-      if (!snapshot.exists()) {
-        await scoreRef.set({home: 0, guest: 0});
-      }
-
-      scoreRef.on("value", snapshot => {
-        updateScore(snapshot.val() || {home: 0, guest: 0});
-      });
-
+      if (!snapshot.exists()) await scoreRef.set({home: 0, guest: 0});
+      scoreRef.on("value", snapshot => updateScore(snapshot.val() || {home: 0, guest: 0}));
     } else {
       if (user) await auth.signOut();
-
       login.style.display = "block";
       controlPanel.style.display = "none";
     }
@@ -341,50 +162,34 @@ if (isControl) {
 
   document.getElementById("loginForm").addEventListener("submit", async event => {
     event.preventDefault();
-
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
-
     document.getElementById("error").textContent = "Anmeldung läuft ...";
-
     try {
       const result = await auth.signInWithEmailAndPassword(email, password);
-
       if (result.user.uid !== allowedUID) {
         await auth.signOut();
         throw new Error("Dieses Konto hat keinen Zugriff.");
       }
-
       document.getElementById("error").textContent = "";
-
     } catch (error) {
-      document.getElementById("error").textContent =
-        "Anmeldung fehlgeschlagen: " + error.message;
+      document.getElementById("error").textContent = "Anmeldung fehlgeschlagen: " + error.message;
     }
   });
 }
 
 function changeScore(team, amount) {
   if (!isControl || !auth.currentUser || auth.currentUser.uid !== allowedUID) return;
-
-  scoreRef.child(team).transaction(current =>
-    Math.max(0, (current || 0) + amount)
-  );
+  scoreRef.child(team).transaction(current => Math.max(0, (current || 0) + amount));
 }
-
 function resetScore() {
   if (!isControl || !auth.currentUser || auth.currentUser.uid !== allowedUID) return;
-
-  if (confirm("Spielstand wirklich zurücksetzen?")) {
-    scoreRef.set({home: 0, guest: 0});
-  }
+  if (confirm("Spielstand wirklich zurücksetzen?")) scoreRef.set({home: 0, guest: 0});
 }
-
 function logout() {
   scoreRef.off();
   auth.signOut();
 }
 </script>
-
 </body>
 </html>
