@@ -4,35 +4,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Badminton Live Scoreboard</title>
+<meta name="theme-color" content="#071525">
+
+<title>SG Brietlingen-Adendorf | Badminton Live Score</title>
 
 <style>
+
+/* =====================================================
+   1. GRUNDEINSTELLUNGEN
+===================================================== */
+
 :root {
   --cyan: #35c9e8;
-  --navy: #101d2c;
-  --panel: #17283a;
+  --cyan-light: #83edff;
+  --navy: #071525;
+  --navy-light: #10263b;
+  --panel: #142b40;
   --white: #ffffff;
   --muted: #a9bacb;
-  --red: #ed3948;
+  --red: #e9273d;
+  --green: #39d69a;
+  --border: rgba(53, 201, 232, 0.65);
 }
 
 * {
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   width: 100%;
+  min-height: 100%;
   font-family: Arial, Helvetica, sans-serif;
   background: transparent;
 }
 
-/* ==================================
-   SCOREBOARD
-================================== */
+button,
+input {
+  font-family: inherit;
+}
+
+/* =====================================================
+   2. ÖFFENTLICHES SCOREBOARD
+===================================================== */
 
 #display {
+  display: block;
   width: 100%;
   padding: 8px;
   background: transparent;
@@ -40,154 +59,257 @@ html, body {
 
 .scoreboard {
   position: relative;
+
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+
+  grid-template-columns:
+    auto
+    minmax(0, 1fr)
+    auto
+    minmax(0, 1fr)
+    auto;
+
   align-items: center;
-  gap: clamp(10px, 2vw, 28px);
+  gap: clamp(12px, 1.7vw, 25px);
 
   width: 100%;
-  max-width: 1150px;
+  max-width: 1500px;
+  min-height: 105px;
+
   margin: 0 auto;
-  padding: 17px 25px 15px;
+  padding: 15px 23px;
 
   color: var(--white);
-  background: linear-gradient(
-    110deg,
-    #101b29,
-    #1a2d40,
-    #101b29
-  );
 
-  border: 1px solid rgba(53, 201, 232, 0.55);
-  border-radius: 12px;
+  background:
+    linear-gradient(
+      105deg,
+      rgba(4, 15, 29, 0.98),
+      rgba(12, 35, 55, 0.98),
+      rgba(4, 15, 29, 0.98)
+    );
+
+  border: 2px solid var(--border);
+  border-radius: 38px;
 
   box-shadow:
-    0 4px 18px rgba(0, 0, 0, 0.25),
-    0 0 12px rgba(53, 201, 232, 0.10);
+    0 0 12px rgba(53, 201, 232, 0.25),
+    0 0 28px rgba(53, 201, 232, 0.12),
+    inset 0 0 20px rgba(53, 201, 232, 0.06);
 
   overflow: hidden;
 }
 
-/* Dezenter cyanfarbener Akzent */
+/* Oberer Lichtstreifen */
 
 .scoreboard::before {
   content: "";
+
   position: absolute;
   top: 0;
-  left: 0;
-  width: 100%;
+  left: 9%;
+
+  width: 82%;
   height: 3px;
 
-  background: linear-gradient(
-    90deg,
-    transparent,
-    var(--cyan),
-    transparent
-  );
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      var(--cyan),
+      var(--cyan-light),
+      var(--cyan),
+      transparent
+    );
 
-  opacity: 0.9;
+  box-shadow: 0 0 12px var(--cyan);
 }
 
-/* ==================================
-   LIVE
-================================== */
+/* Kleine Lichtakzente */
+
+.scoreboard::after {
+  content: "";
+
+  position: absolute;
+  bottom: 0;
+  left: 18%;
+
+  width: 64%;
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(53, 201, 232, 0.5),
+      transparent
+    );
+}
+
+/* =====================================================
+   3. LIVE ANZEIGE
+===================================================== */
 
 .live {
-  position: absolute;
-  top: -1px;
-  left: 20px;
+  position: relative;
+  z-index: 2;
 
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 8px;
 
-  padding: 4px 10px;
+  padding: 8px 13px;
 
-  background: var(--red);
   color: white;
+  background: var(--red);
 
-  font-size: 10px;
+  border-radius: 7px;
+
+  font-size: clamp(12px, 1.3vw, 18px);
   font-weight: 900;
   letter-spacing: 1px;
 
-  border-radius: 0 0 5px 5px;
+  white-space: nowrap;
+
+  box-shadow:
+    0 0 12px rgba(233, 39, 61, 0.25);
 }
 
 .live-dot {
-  width: 7px;
-  height: 7px;
+  width: 10px;
+  height: 10px;
+
+  flex-shrink: 0;
+
   background: white;
   border-radius: 50%;
 
-  animation: pulse 1.5s infinite;
+  animation: livePulse 1.5s infinite;
 }
 
-@keyframes pulse {
+@keyframes livePulse {
   0%, 100% {
     opacity: 1;
+    box-shadow: 0 0 5px white;
   }
 
   50% {
-    opacity: 0.35;
+    opacity: 0.4;
+    box-shadow: none;
   }
 }
 
-/* ==================================
-   TEAM NAMEN
-================================== */
+/* =====================================================
+   4. MANNSCHAFTSNAMEN
+===================================================== */
 
 .team {
   min-width: 0;
-  padding-top: 12px;
 
-  font-size: clamp(13px, 2vw, 25px);
-  font-weight: 800;
-  letter-spacing: 0.2px;
+  color: white;
+
+  font-size: clamp(15px, 2vw, 27px);
+  font-weight: 900;
+  letter-spacing: 0.1px;
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  text-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.35);
+
+  padding: 8px 5px;
 }
 
 .home-team {
-  text-align: left;
+  text-align: center;
 }
 
 .guest-team {
-  text-align: right;
+  text-align: center;
 }
 
-/* ==================================
-   SPIELSTAND
-================================== */
+/* Dezente Linie unter den Mannschaftsnamen */
+
+.team::after {
+  content: "";
+
+  display: block;
+
+  width: 100%;
+  height: 2px;
+
+  margin-top: 7px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      var(--cyan),
+      transparent
+    );
+
+  opacity: 0.65;
+}
+
+/* =====================================================
+   5. SPIELSTAND
+===================================================== */
 
 .score-area {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(9px, 1.5vw, 18px);
 
-  padding-top: 8px;
+  gap: clamp(8px, 1vw, 14px);
+
+  position: relative;
+  z-index: 1;
 }
 
 .score {
-  min-width: clamp(42px, 5vw, 68px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  color: white;
-  font-size: clamp(32px, 5vw, 62px);
+  width: clamp(58px, 7vw, 91px);
+  height: clamp(58px, 7vw, 78px);
+
+  color: #101d2c;
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff,
+      #e9f4fa
+    );
+
+  border: 1px solid rgba(255,255,255,0.9);
+  border-radius: 14px;
+
+  font-size: clamp(36px, 5vw, 65px);
   font-weight: 900;
   line-height: 1;
-  text-align: center;
 
   font-variant-numeric: tabular-nums;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.28),
+    inset 0 1px 2px rgba(255,255,255,0.8);
 }
 
 .separator {
   color: var(--cyan);
-  font-size: clamp(25px, 3.5vw, 42px);
-  font-weight: 300;
+
+  font-size: clamp(28px, 4vw, 46px);
+  font-weight: 900;
+
+  text-shadow:
+    0 0 10px rgba(53, 201, 232, 0.35);
 }
+
+/* Animation bei Punkteänderung */
 
 .score.changed {
   animation: scorePop 0.45s ease;
@@ -196,117 +318,221 @@ html, body {
 @keyframes scorePop {
   0% {
     transform: scale(1);
-    color: white;
   }
 
   45% {
-    transform: scale(1.22);
-    color: var(--cyan);
+    transform: scale(1.14);
+    box-shadow:
+      0 0 18px rgba(53, 201, 232, 0.7);
   }
 
   100% {
     transform: scale(1);
-    color: white;
   }
 }
 
-/* ==================================
-   FEDERBALL ICON
-================================== */
+/* =====================================================
+   6. FEDERBALL
+===================================================== */
 
 .shuttlecock {
-  position: absolute;
-  right: 10px;
-  bottom: 8px;
+  position: relative;
+  z-index: 2;
 
-  width: 19px;
-  height: 19px;
+  display: block;
 
-  opacity: 0.35;
+  width: clamp(38px, 4.2vw, 61px);
+  height: clamp(38px, 4.2vw, 61px);
+
+  overflow: visible;
+
+  opacity: 1;
+
+  filter:
+    drop-shadow(0 0 5px rgba(53, 201, 232, 0.65))
+    drop-shadow(0 0 10px rgba(53, 201, 232, 0.25));
 }
 
-/* ==================================
-   MOBILE
-================================== */
+/* =====================================================
+   7. RESPONSIVE SCOREBOARD
+===================================================== */
 
-@media (max-width: 650px) {
+@media (max-width: 800px) {
+
+  .scoreboard {
+    gap: 10px;
+    padding: 13px 14px;
+    min-height: 90px;
+  }
+
+  .team {
+    font-size: clamp(12px, 2vw, 18px);
+  }
+
+  .score {
+    width: 55px;
+    height: 56px;
+    font-size: 38px;
+  }
+
+  .shuttlecock {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+@media (max-width: 600px) {
+
   #display {
     padding: 5px;
   }
 
   .scoreboard {
-    gap: 7px;
-    padding: 17px 9px 12px;
-    border-radius: 8px;
-  }
+    grid-template-columns:
+      auto
+      minmax(0, 1fr)
+      auto;
 
-  .team {
-    font-size: clamp(10px, 2.5vw, 15px);
-    white-space: normal;
-    line-height: 1.2;
-  }
+    gap: 6px;
 
-  .score-area {
-    gap: 4px;
-  }
+    padding: 11px 9px;
 
-  .score {
-    min-width: 29px;
-    font-size: clamp(25px, 6vw, 38px);
-  }
-
-  .separator {
-    font-size: 23px;
+    border-radius: 19px;
+    min-height: 0;
   }
 
   .live {
-    left: 10px;
+    grid-column: 1;
+    grid-row: 1;
+
+    padding: 5px 7px;
     font-size: 9px;
-    padding: 3px 7px;
+  }
+
+  .home-team {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .score-area {
+    grid-column: 1 / 4;
+    grid-row: 2;
+
+    padding: 7px 0;
+    gap: 9px;
+  }
+
+  .guest-team {
+    grid-column: 2;
+    grid-row: 3;
+  }
+
+  .shuttlecock {
+    grid-column: 3;
+    grid-row: 1;
+
+    width: 27px;
+    height: 27px;
+  }
+
+  .team {
+    font-size: clamp(11px, 3vw, 15px);
+    white-space: normal;
+    line-height: 1.2;
+    padding: 3px;
+  }
+
+  .team::after {
+    margin-top: 4px;
+  }
+
+  .score {
+    width: 52px;
+    height: 47px;
+
+    font-size: 34px;
+    border-radius: 9px;
+  }
+
+  .separator {
+    font-size: 27px;
   }
 }
 
-/* ==================================
-   STEUERUNG
-================================== */
+/* =====================================================
+   8. ADMIN BEREICH
+===================================================== */
 
 #control {
   display: none;
+
   min-height: 100vh;
   padding: 20px;
 
   color: white;
-  background: #0d1724;
+  background:
+    radial-gradient(
+      circle at top,
+      #18344c,
+      #0d1724 65%
+    );
+
   text-align: center;
 }
 
 .card {
   width: 100%;
   max-width: 650px;
+
   margin: 30px auto;
   padding: 25px;
 
-  background: #17283a;
-  border: 1px solid #29445c;
-  border-radius: 14px;
+  background:
+    linear-gradient(
+      145deg,
+      #172d43,
+      #102235
+    );
+
+  border: 1px solid #294b66;
+  border-radius: 16px;
+
+  box-shadow:
+    0 8px 30px rgba(0,0,0,0.25);
 }
 
 .card h1 {
   margin-top: 5px;
+  margin-bottom: 8px;
 }
 
+.card p {
+  color: var(--muted);
+}
+
+/* =====================================================
+   9. LOGIN UND EINGABEN
+===================================================== */
+
 input {
+  display: block;
+
   width: 100%;
-  padding: 13px;
-  margin: 9px 0;
+  padding: 14px;
+  margin: 10px 0;
 
   color: #142233;
   background: white;
 
   border: 1px solid #9baabb;
-  border-radius: 8px;
+  border-radius: 9px;
 
   font-size: 16px;
+}
+
+input:focus {
+  outline: 2px solid var(--cyan);
+  border-color: var(--cyan);
 }
 
 button {
@@ -314,18 +540,37 @@ button {
   margin: 5px;
 
   color: white;
-  background: #1686c9;
+  background:
+    linear-gradient(
+      135deg,
+      #1686c9,
+      #0872b4
+    );
 
-  border: none;
-  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 9px;
 
   font-size: 17px;
   font-weight: bold;
+
   cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    filter 0.15s ease;
+}
+
+button:hover {
+  filter: brightness(1.13);
 }
 
 button:active {
   transform: scale(0.97);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .minus,
@@ -337,6 +582,10 @@ button:active {
   background: #a83240;
 }
 
+/* =====================================================
+   10. STEUERUNG DER MANNSCHAFTEN
+===================================================== */
+
 .teams-control {
   display: flex;
   gap: 15px;
@@ -345,11 +594,13 @@ button:active {
 .team-control {
   flex: 1;
   min-width: 0;
+
   padding: 12px 5px;
 
   background: #101d2c;
+
   border: 1px solid #29445c;
-  border-radius: 10px;
+  border-radius: 12px;
 }
 
 .team-control h3 {
@@ -359,16 +610,23 @@ button:active {
 
 .control-score {
   margin: 15px 0;
+
+  color: white;
+
   font-size: 52px;
   font-weight: 900;
+  font-variant-numeric: tabular-nums;
 }
 
 .section-title {
   margin-top: 28px;
   margin-bottom: 10px;
+
+  color: var(--cyan);
+
   text-align: left;
   font-size: 16px;
-  color: var(--cyan);
+  font-weight: bold;
 }
 
 #error {
@@ -376,17 +634,34 @@ button:active {
 }
 
 #status {
-  color: #a9bacb;
+  color: var(--muted);
   font-size: 13px;
 }
 
+#opponentStatus {
+  font-size: 13px;
+  color: var(--green);
+}
+
+/* Control-Panel erst nach erfolgreichem Login zeigen */
+
+#controlPanel {
+  display: none;
+}
+
+/* =====================================================
+   11. MOBILE STEUERUNG
+===================================================== */
+
 @media (max-width: 480px) {
+
   #control {
     padding: 8px;
   }
 
   .card {
     padding: 14px;
+    margin: 15px auto;
   }
 
   .team-control h3 {
@@ -402,55 +677,108 @@ button:active {
     font-size: 15px;
   }
 }
+
 </style>
 </head>
 
 <body>
 
-<!-- ==================================
+<!-- =====================================================
      ÖFFENTLICHES SCOREBOARD
-================================== -->
+===================================================== -->
 
 <div id="display">
 
   <div class="scoreboard">
+
+    <!-- LIVE -->
 
     <div class="live">
       <span class="live-dot"></span>
       LIVE
     </div>
 
+    <!-- HEIMMANNSCHAFT -->
+
     <div class="team home-team">
       SG Brietlingen-Adendorf
     </div>
 
+    <!-- SPIELSTAND -->
+
     <div class="score-area">
+
       <div class="score" id="homeDisplay">0</div>
+
       <div class="separator">:</div>
+
       <div class="score" id="guestDisplay">0</div>
+
     </div>
+
+    <!-- GASTMANNSCHAFT -->
 
     <div class="team guest-team" id="opponentDisplay">
       Gegner
     </div>
 
-    <svg class="shuttlecock"
-         viewBox="0 0 100 100"
-         fill="none"
-         stroke="#35c9e8"
-         stroke-width="6"
-         stroke-linecap="round">
+    <!-- FEDERBALL -->
 
-      <path d="M50 72 L20 25"/>
-      <path d="M50 72 L35 12"/>
-      <path d="M50 72 L50 8"/>
-      <path d="M50 72 L65 12"/>
-      <path d="M50 72 L80 25"/>
-      <path d="M20 25 Q50 0 80 25"/>
+    <svg
+      class="shuttlecock"
+      viewBox="0 0 100 100"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      aria-label="Badminton Federball"
+      role="img"
+    >
 
-      <path d="M38 70 Q50 60 62 70 L58 92 Q50 100 42 92 Z"
-            fill="#35c9e8"
-            stroke="none"/>
+      <!-- Federn -->
+
+      <g
+        stroke="#ffffff"
+        stroke-width="5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+
+        <path d="M50 69 L13 17"/>
+        <path d="M50 69 L31 8"/>
+        <path d="M50 69 L50 5"/>
+        <path d="M50 69 L69 8"/>
+        <path d="M50 69 L87 17"/>
+
+        <path d="M13 17 Q50 -8 87 17"/>
+
+      </g>
+
+      <!-- Cyanfarbener Federrand -->
+
+      <path
+        d="M13 17 L31 8 L50 5 L69 8 L87 17"
+        stroke="#35c9e8"
+        stroke-width="3"
+        stroke-linecap="round"
+        fill="none"
+      />
+
+      <!-- Korkkopf -->
+
+      <path
+        d="M39 65 Q50 58 61 65 L57 91 Q50 99 43 91 Z"
+        fill="#ffffff"
+        stroke="#35c9e8"
+        stroke-width="3"
+      />
+
+      <!-- Detail am Kork -->
+
+      <path
+        d="M43 72 L57 72"
+        stroke="#35c9e8"
+        stroke-width="2"
+        stroke-linecap="round"
+      />
 
     </svg>
 
@@ -459,11 +787,13 @@ button:active {
 </div>
 
 
-<!-- ==================================
+<!-- =====================================================
      ADMIN STEUERUNG
-================================== -->
+===================================================== -->
 
 <div id="control">
+
+  <!-- LOGIN -->
 
   <div id="login" class="card">
 
@@ -489,7 +819,9 @@ button:active {
         required
       >
 
-      <button type="submit">Anmelden</button>
+      <button type="submit">
+        Anmelden
+      </button>
 
     </form>
 
@@ -498,13 +830,16 @@ button:active {
   </div>
 
 
+  <!-- STEUERUNG NACH LOGIN -->
+
   <div id="controlPanel" class="card">
 
     <h1>Spielstandssteuerung</h1>
 
     <p>SG Brietlingen-Adendorf</p>
 
-    <!-- Gegnername ändern -->
+
+    <!-- GEGNERNAMEN -->
 
     <div class="section-title">
       Gegnerische Mannschaft
@@ -524,13 +859,15 @@ button:active {
     <p id="opponentStatus"></p>
 
 
-    <!-- Spielstände -->
+    <!-- SPIELSTÄNDE -->
 
     <div class="section-title">
       Mannschaftsspielstand
     </div>
 
     <div class="teams-control">
+
+      <!-- HEIM -->
 
       <div class="team-control">
 
@@ -540,18 +877,25 @@ button:active {
           0
         </div>
 
-        <button class="minus"
-          onclick="changeScore('home', -1)">
+        <button
+          class="minus"
+          onclick="changeScore('home', -1)"
+          aria-label="Punkt abziehen"
+        >
           −
         </button>
 
         <button
-          onclick="changeScore('home', 1)">
+          onclick="changeScore('home', 1)"
+          aria-label="Punkt hinzufügen"
+        >
           +
         </button>
 
       </div>
 
+
+      <!-- GAST -->
 
       <div class="team-control">
 
@@ -563,13 +907,18 @@ button:active {
           0
         </div>
 
-        <button class="minus"
-          onclick="changeScore('guest', -1)">
+        <button
+          class="minus"
+          onclick="changeScore('guest', -1)"
+          aria-label="Punkt abziehen"
+        >
           −
         </button>
 
         <button
-          onclick="changeScore('guest', 1)">
+          onclick="changeScore('guest', 1)"
+          aria-label="Punkt hinzufügen"
+        >
           +
         </button>
 
@@ -577,15 +926,26 @@ button:active {
 
     </div>
 
+
+    <!-- ZURÜCKSETZEN -->
+
     <br>
 
-    <button class="reset" onclick="resetScore()">
+    <button
+      class="reset"
+      onclick="resetScore()"
+    >
       Spielstand zurücksetzen
     </button>
 
-    <p id="status">Verbinde mit Firebase ...</p>
+    <p id="status">
+      Verbinde mit Firebase ...
+    </p>
 
-    <button class="logout" onclick="logout()">
+    <button
+      class="logout"
+      onclick="logout()"
+    >
       Abmelden
     </button>
 
@@ -594,87 +954,107 @@ button:active {
 </div>
 
 
-<!-- ==================================
-     FIREBASE
-================================== -->
+<!-- =====================================================
+     FIREBASE BIBLIOTHEKEN
+===================================================== -->
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
 
 <script>
 
-/* FIREBASE KONFIGURATION */
+/* =====================================================
+   12. FIREBASE KONFIGURATION
+===================================================== */
 
 const firebaseConfig = {
+
   apiKey: "AIzaSyDhYBRhGo3jlKSjullTBQaprgaoSPA7dXk",
-  authDomain: "badminton-scoreboard-5c4b4.firebaseapp.com",
-  databaseURL: "https://badminton-scoreboard-5c4b4-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "badminton-scoreboard-5c4b4",
-  storageBucket: "badminton-scoreboard-5c4b4.firebasestorage.app",
-  messagingSenderId: "257689447899",
-  appId: "1:257689447899:web:37fd7d47ff7c5e0eae4bfe"
+
+  authDomain:
+    "badminton-scoreboard-5c4b4.firebaseapp.com",
+
+  databaseURL:
+    "https://badminton-scoreboard-5c4b4-default-rtdb.europe-west1.firebasedatabase.app",
+
+  projectId:
+    "badminton-scoreboard-5c4b4",
+
+  storageBucket:
+    "badminton-scoreboard-5c4b4.firebasestorage.app",
+
+  messagingSenderId:
+    "257689447899",
+
+  appId:
+    "1:257689447899:web:37fd7d47ff7c5e0eae4bfe"
+
 };
 
-const allowedUID = "NWl3lBL8XEZBiQKniVsIXiKsHB73";
+
+/* Erlaubter Benutzer */
+
+const allowedUID =
+  "NWl3lBL8XEZBiQKniVsIXiKsHB73";
+
+
+/* Firebase starten */
 
 firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
+
 const database = firebase.database();
+
+
+/* Datenbankpfad */
 
 const scoreRef =
   database.ref("matches/badminton1");
 
 
-/* SEITE ERKENNEN */
+/* =====================================================
+   13. SEITE ERKENNEN
+===================================================== */
 
 const isControl =
-  new URLSearchParams(location.search).get("control") === "1";
-
-const display = document.getElementById("display");
-const control = document.getElementById("control");
-const login = document.getElementById("login");
-const controlPanel = document.getElementById("controlPanel");
+  new URLSearchParams(location.search)
+    .get("control") === "1";
 
 
-/* NAMEN UND SPIELSTÄNDE AKTUALISIEREN */
+const display =
+  document.getElementById("display");
 
-function updateScore(data) {
+const control =
+  document.getElementById("control");
 
-  const home = Number(data.home ?? 0);
-  const guest = Number(data.guest ?? 0);
-  const opponent = String(data.opponent || "Gegner");
+const login =
+  document.getElementById("login");
 
-  updateNumber("homeDisplay", home);
-  updateNumber("guestDisplay", guest);
-
-  document.getElementById("homeControl").textContent = home;
-  document.getElementById("guestControl").textContent = guest;
-
-  document.getElementById("opponentDisplay").textContent =
-    opponent;
-
-  document.getElementById("opponentControlName").textContent =
-    opponent;
-
-  const input = document.getElementById("opponentInput");
-
-  if (document.activeElement !== input) {
-    input.value = opponent;
-  }
-}
+const controlPanel =
+  document.getElementById("controlPanel");
 
 
-/* ZAHLENANIMATION */
+/* =====================================================
+   14. ZAHLENAKTUALISIERUNG
+===================================================== */
 
 function updateNumber(id, value) {
 
-  const element = document.getElementById(id);
+  const element =
+    document.getElementById(id);
 
-  if (element.textContent !== String(value)) {
+  if (!element) return;
 
-    element.textContent = value;
+  const newValue = String(value);
+
+  if (element.textContent !== newValue) {
+
+    element.textContent = newValue;
 
     element.classList.remove("changed");
 
@@ -683,85 +1063,235 @@ function updateNumber(id, value) {
     element.classList.add("changed");
 
   }
+
 }
 
 
-/* ÖFFENTLICHE ANZEIGE */
+/* =====================================================
+   15. ALLE DATEN AKTUALISIEREN
+===================================================== */
+
+function updateScore(data) {
+
+  const home =
+    Math.max(0, Number(data.home ?? 0));
+
+  const guest =
+    Math.max(0, Number(data.guest ?? 0));
+
+  const opponent =
+    String(data.opponent || "Gegner");
+
+
+  /* Öffentliche Anzeige */
+
+  updateNumber("homeDisplay", home);
+
+  updateNumber("guestDisplay", guest);
+
+
+  /* Steuerung */
+
+  const homeControl =
+    document.getElementById("homeControl");
+
+  if (homeControl) {
+    homeControl.textContent = home;
+  }
+
+
+  const guestControl =
+    document.getElementById("guestControl");
+
+  if (guestControl) {
+    guestControl.textContent = guest;
+  }
+
+
+  /* Gegnername öffentlich */
+
+  const opponentDisplay =
+    document.getElementById("opponentDisplay");
+
+  if (opponentDisplay) {
+    opponentDisplay.textContent = opponent;
+  }
+
+
+  /* Gegnername in der Steuerung */
+
+  const opponentControlName =
+    document.getElementById("opponentControlName");
+
+  if (opponentControlName) {
+    opponentControlName.textContent = opponent;
+  }
+
+
+  /* Eingabefeld nicht überschreiben,
+     wenn gerade darin geschrieben wird */
+
+  const input =
+    document.getElementById("opponentInput");
+
+  if (
+    input &&
+    document.activeElement !== input
+  ) {
+
+    input.value = opponent;
+
+  }
+
+}
+
+
+/* =====================================================
+   16. STANDARDWERTE
+===================================================== */
+
+const defaultData = {
+
+  home: 0,
+
+  guest: 0,
+
+  opponent: "Gegner"
+
+};
+
+
+/* =====================================================
+   17. ÖFFENTLICHE ANZEIGE
+===================================================== */
 
 if (!isControl) {
 
-  scoreRef.on("value", snapshot => {
+  display.style.display = "block";
 
-    updateScore(
-      snapshot.val() || {
-        home: 0,
-        guest: 0,
-        opponent: "Gegner"
-      }
-    );
+  scoreRef.on(
+    "value",
 
-  }, error => {
-    console.error("Firebase:", error);
-  });
+    snapshot => {
+
+      const data =
+        snapshot.val() || defaultData;
+
+      updateScore(data);
+
+    },
+
+    error => {
+
+      console.error(
+        "Firebase Fehler:",
+        error
+      );
+
+    }
+
+  );
 
 }
 
 
-/* ADMIN BEREICH */
+/* =====================================================
+   18. ADMIN BEREICH
+===================================================== */
 
 if (isControl) {
 
+  /* Öffentliches Scoreboard ausblenden */
+
   display.style.display = "none";
+
+  /* Steuerungsseite anzeigen */
+
   control.style.display = "block";
+
+
+  /* Firebase Loginstatus überwachen */
 
   auth.onAuthStateChanged(async user => {
 
-    if (user && user.uid === allowedUID) {
+    if (
+      user &&
+      user.uid === allowedUID
+    ) {
 
       login.style.display = "none";
+
       controlPanel.style.display = "block";
 
-      document.getElementById("status").textContent =
+
+      const status =
+        document.getElementById("status");
+
+      status.textContent =
         "Verbunden mit Firebase";
+
 
       try {
 
-        const snapshot = await scoreRef.once("value");
+        /* Datenbank prüfen */
+
+        const snapshot =
+          await scoreRef.once("value");
+
+
+        /* Nur beim ersten Start Standardwerte setzen */
 
         if (!snapshot.exists()) {
 
-          await scoreRef.set({
-            home: 0,
-            guest: 0,
-            opponent: "Gegner"
-          });
+          await scoreRef.set(defaultData);
 
         }
 
-        scoreRef.on("value", snapshot => {
 
-          updateScore(
-            snapshot.val() || {
-              home: 0,
-              guest: 0,
-              opponent: "Gegner"
-            }
-          );
+        /* Änderungen live überwachen */
 
-        });
+        scoreRef.off("value");
+
+        scoreRef.on(
+          "value",
+
+          snapshot => {
+
+            updateScore(
+              snapshot.val() || defaultData
+            );
+
+          },
+
+          error => {
+
+            status.textContent =
+              "Datenbankfehler: " + error.message;
+
+          }
+
+        );
+
 
       } catch (error) {
 
-        document.getElementById("status").textContent =
+        status.textContent =
           "Fehler: " + error.message;
 
       }
 
     } else {
 
-      if (user) await auth.signOut();
+      /* Nicht erlaubte Benutzer abmelden */
+
+      if (user) {
+
+        await auth.signOut();
+
+      }
 
       login.style.display = "block";
+
       controlPanel.style.display = "none";
 
     }
@@ -769,49 +1299,78 @@ if (isControl) {
   });
 
 
-  /* LOGIN */
+  /* ===================================================
+     19. LOGIN
+  =================================================== */
 
-  document.getElementById("loginForm")
-    .addEventListener("submit", async event => {
+  document
+    .getElementById("loginForm")
+    .addEventListener(
+      "submit",
 
-      event.preventDefault();
+      async event => {
 
-      const errorElement =
-        document.getElementById("error");
+        event.preventDefault();
 
-      errorElement.textContent = "Anmeldung läuft ...";
+        const errorElement =
+          document.getElementById("error");
 
-      try {
+        errorElement.textContent =
+          "Anmeldung läuft ...";
 
-        const result =
-          await auth.signInWithEmailAndPassword(
-            document.getElementById("email").value,
-            document.getElementById("password").value
-          );
 
-        if (result.user.uid !== allowedUID) {
+        try {
 
-          await auth.signOut();
+          const email =
+            document.getElementById("email").value;
 
-          throw new Error("Kein Zugriff auf die Steuerung.");
+          const password =
+            document.getElementById("password").value;
+
+
+          const result =
+            await auth.signInWithEmailAndPassword(
+              email,
+              password
+            );
+
+
+          /* UID prüfen */
+
+          if (
+            result.user.uid !== allowedUID
+          ) {
+
+            await auth.signOut();
+
+            throw new Error(
+              "Kein Zugriff auf die Steuerung."
+            );
+
+          }
+
+
+          errorElement.textContent = "";
+
+
+        } catch (error) {
+
+          errorElement.textContent =
+            "Anmeldung fehlgeschlagen: " +
+            error.message;
 
         }
 
-        errorElement.textContent = "";
-
-      } catch (error) {
-
-        errorElement.textContent =
-          "Anmeldung fehlgeschlagen: " + error.message;
-
       }
 
-    });
+    );
 
 }
 
 
-/* SPIELSTAND ÄNDERN */
+/* =====================================================
+   20. SPIELSTAND ÄNDERN
+===================================================== */
 
 function changeScore(team, amount) {
 
@@ -819,18 +1378,43 @@ function changeScore(team, amount) {
     !isControl ||
     !auth.currentUser ||
     auth.currentUser.uid !== allowedUID
-  ) return;
+  ) {
 
-  scoreRef.child(team).transaction(current => {
+    return;
 
-    return Math.max(0, Number(current || 0) + amount);
+  }
 
-  });
+
+  if (
+    team !== "home" &&
+    team !== "guest"
+  ) {
+
+    return;
+
+  }
+
+
+  scoreRef
+    .child(team)
+    .transaction(current => {
+
+      const currentScore =
+        Number(current || 0);
+
+      return Math.max(
+        0,
+        currentScore + amount
+      );
+
+    });
 
 }
 
 
-/* GEGNERNAMEN SPEICHERN */
+/* =====================================================
+   21. GEGNERNAMEN SPEICHERN
+===================================================== */
 
 async function saveOpponent() {
 
@@ -838,41 +1422,58 @@ async function saveOpponent() {
     !isControl ||
     !auth.currentUser ||
     auth.currentUser.uid !== allowedUID
-  ) return;
+  ) {
 
-  const input =
-    document.getElementById("opponentInput");
-
-  const opponent = input.value.trim();
-
-  const status =
-    document.getElementById("opponentStatus");
-
-  if (!opponent) {
-
-    status.textContent = "Bitte einen Namen eingeben.";
     return;
 
   }
 
-  try {
 
-    await scoreRef.child("opponent").set(opponent);
+  const input =
+    document.getElementById("opponentInput");
+
+  const opponent =
+    input.value.trim();
+
+
+  const status =
+    document.getElementById("opponentStatus");
+
+
+  if (!opponent) {
 
     status.textContent =
-      "Gegnername erfolgreich gespeichert.";
+      "Bitte einen Mannschaftsnamen eingeben.";
+
+    return;
+
+  }
+
+
+  try {
+
+    await scoreRef
+      .child("opponent")
+      .set(opponent);
+
+
+    status.textContent =
+      "✓ Gegnername erfolgreich gespeichert.";
+
 
   } catch (error) {
 
     status.textContent =
-      "Fehler beim Speichern: " + error.message;
+      "Fehler: " + error.message;
 
   }
 
 }
 
 
-/* SPIELSTAND ZURÜCKSETZEN */
+/* =====================================================
+   22. SPIELSTAND ZURÜCKSETZEN
+===================================================== */
 
 function resetScore() {
 
@@ -880,25 +1481,43 @@ function resetScore() {
     !isControl ||
     !auth.currentUser ||
     auth.currentUser.uid !== allowedUID
-  ) return;
+  ) {
 
-  if (confirm("Spielstand wirklich zurücksetzen?")) {
-
-    scoreRef.update({
-      home: 0,
-      guest: 0
-    });
+    return;
 
   }
+
+
+  const confirmed =
+    confirm(
+      "Möchtest du den Spielstand wirklich auf 0:0 zurücksetzen?"
+    );
+
+
+  if (!confirmed) return;
+
+
+  scoreRef.update({
+
+    home: 0,
+
+    guest: 0
+
+  });
 
 }
 
 
-/* ABMELDEN */
+/* =====================================================
+   23. ABMELDEN
+===================================================== */
 
 function logout() {
 
-  scoreRef.off();
+  if (!isControl) return;
+
+  scoreRef.off("value");
+
   auth.signOut();
 
 }
