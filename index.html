@@ -3,591 +3,341 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>SG Brietlingen-Adendorf | Live Scoreboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Badminton Live Scoreboard</title>
 
 <style>
-
-/* =========================================
-   1. GRUNDEINSTELLUNGEN
-========================================= */
-
 :root {
-  --cyan: #00eaff;
-  --cyan-light: #8af7ff;
-  --blue: #087cff;
-  --dark: #030914;
-  --panel: #071827;
+  --cyan: #35c9e8;
+  --navy: #101d2c;
+  --panel: #17283a;
   --white: #ffffff;
-  --red: #ff202d;
+  --muted: #a9bacb;
+  --red: #ed3948;
 }
 
 * {
   box-sizing: border-box;
 }
 
-html,
-body {
+html, body {
   margin: 0;
   padding: 0;
   width: 100%;
-  min-height: 100%;
   font-family: Arial, Helvetica, sans-serif;
-}
-
-body {
   background: transparent;
-  overflow-x: hidden;
 }
 
-/* =========================================
-   2. ÖFFENTLICHES OVERLAY
-========================================= */
+/* ==================================
+   SCOREBOARD
+================================== */
 
 #display {
-  display: block;
   width: 100%;
-  padding: 12px;
+  padding: 8px;
   background: transparent;
 }
 
 .scoreboard {
   position: relative;
   display: grid;
-
-  grid-template-columns:
-    minmax(0, 1fr)
-    clamp(65px, 8vw, 125px)
-    clamp(90px, 11vw, 165px)
-    clamp(65px, 8vw, 125px)
-    minmax(0, 1fr);
-
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
+  gap: clamp(10px, 2vw, 28px);
+
   width: 100%;
-  max-width: 1900px;
-  min-height: clamp(105px, 13vw, 205px);
+  max-width: 1150px;
   margin: 0 auto;
+  padding: 17px 25px 15px;
 
-  padding: 15px 20px;
-
-  background:
-    linear-gradient(
-      110deg,
-      rgba(3, 12, 25, 0.98),
-      rgba(5, 31, 52, 0.97),
-      rgba(2, 12, 25, 0.98)
-    );
-
-  border: 2px solid rgba(0, 234, 255, 0.8);
-
-  clip-path: polygon(
-    2% 0,
-    98% 0,
-    100% 18%,
-    98% 100%,
-    2% 100%,
-    0 82%
+  color: var(--white);
+  background: linear-gradient(
+    110deg,
+    #101b29,
+    #1a2d40,
+    #101b29
   );
 
-  box-shadow:
-    0 0 12px var(--cyan),
-    0 0 28px rgba(0, 234, 255, 0.35),
-    inset 0 0 25px rgba(0, 234, 255, 0.08);
+  border: 1px solid rgba(53, 201, 232, 0.55);
+  border-radius: 12px;
 
-  isolation: isolate;
+  box-shadow:
+    0 4px 18px rgba(0, 0, 0, 0.25),
+    0 0 12px rgba(53, 201, 232, 0.10);
+
+  overflow: hidden;
 }
 
-/* =========================================
-   3. ANIMIERTE LICHTLINIEN
-========================================= */
+/* Dezenter cyanfarbener Akzent */
 
 .scoreboard::before {
   content: "";
   position: absolute;
-  inset: 5px;
-  z-index: -1;
-  pointer-events: none;
-
-  border-top: 2px solid var(--cyan);
-  border-bottom: 2px solid var(--cyan);
-
-  opacity: 0.8;
-
-  animation: borderPulse 2.5s ease-in-out infinite;
-}
-
-.scoreboard::after {
-  content: "";
-  position: absolute;
   top: 0;
-  left: -40%;
-  width: 30%;
-  height: 100%;
-  z-index: 5;
-  pointer-events: none;
+  left: 0;
+  width: 100%;
+  height: 3px;
 
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(0, 234, 255, 0.05),
-    rgba(138, 247, 255, 0.5),
-    rgba(0, 234, 255, 0.05),
+    var(--cyan),
     transparent
   );
 
-  transform: skewX(-25deg);
-  animation: lightSweep 5s linear infinite;
+  opacity: 0.9;
 }
 
-@keyframes borderPulse {
-  0%, 100% {
-    opacity: 0.45;
-    filter: brightness(0.8);
-  }
+/* ==================================
+   LIVE
+================================== */
 
-  50% {
-    opacity: 1;
-    filter: brightness(1.6);
-  }
-}
-
-@keyframes lightSweep {
-  0% {
-    left: -40%;
-  }
-
-  100% {
-    left: 140%;
-  }
-}
-
-/* =========================================
-   4. LIVE BADGE
-========================================= */
-
-.live-badge {
+.live {
   position: absolute;
-  top: -12px;
-  left: 22px;
-  z-index: 8;
+  top: -1px;
+  left: 20px;
 
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 6px;
 
-  padding: 8px 18px;
+  padding: 4px 10px;
 
+  background: var(--red);
   color: white;
-  background: linear-gradient(135deg, #ff3542, #c90018);
 
-  border: 1px solid #ff8a91;
-  border-radius: 8px;
-
-  font-size: clamp(11px, 1.3vw, 19px);
+  font-size: 10px;
   font-weight: 900;
-  font-style: italic;
   letter-spacing: 1px;
 
-  box-shadow:
-    0 0 12px rgba(255, 32, 45, 0.65);
+  border-radius: 0 0 5px 5px;
 }
 
 .live-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
+  width: 7px;
+  height: 7px;
   background: white;
+  border-radius: 50%;
 
-  box-shadow: 0 0 10px white;
-
-  animation: livePulse 1.2s ease-in-out infinite;
+  animation: pulse 1.5s infinite;
 }
 
-@keyframes livePulse {
+@keyframes pulse {
   0%, 100% {
     opacity: 1;
-    transform: scale(1);
-    box-shadow: 0 0 5px white;
   }
 
   50% {
-    opacity: 0.45;
-    transform: scale(1.45);
-    box-shadow: 0 0 15px white;
+    opacity: 0.35;
   }
 }
 
-/* =========================================
-   5. MANNSCHAFTSNAMEN
-========================================= */
+/* ==================================
+   TEAM NAMEN
+================================== */
 
-.team-name {
-  position: relative;
-  z-index: 2;
+.team {
+  min-width: 0;
+  padding-top: 12px;
 
-  color: white;
-  font-size: clamp(13px, 2.1vw, 34px);
-  font-weight: 900;
-  font-style: italic;
+  font-size: clamp(13px, 2vw, 25px);
+  font-weight: 800;
+  letter-spacing: 0.2px;
 
-  text-align: center;
   white-space: nowrap;
-
-  text-shadow:
-    0 0 8px rgba(0, 234, 255, 0.35);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .home-team {
-  padding: 0 10px 0 20px;
+  text-align: left;
 }
 
 .guest-team {
-  padding: 0 20px 0 10px;
+  text-align: right;
 }
 
-/* =========================================
-   6. SPIELSTAND-FELDER
-========================================= */
+/* ==================================
+   SPIELSTAND
+================================== */
 
-.score-box {
-  position: relative;
-  z-index: 4;
-
+.score-area {
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: clamp(9px, 1.5vw, 18px);
 
-  width: 100%;
-  aspect-ratio: 1 / 1;
-
-  max-height: 115px;
-
-  color: #061a2a;
-  background: linear-gradient(
-    145deg,
-    #ffffff,
-    #dcecf4
-  );
-
-  border: 2px solid white;
-  border-radius: 17px;
-
-  font-size: clamp(32px, 5vw, 76px);
-  font-weight: 1000;
-
-  box-shadow:
-    0 0 12px rgba(0, 234, 255, 0.65),
-    inset 0 0 12px rgba(0, 0, 0, 0.08);
-
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  padding-top: 8px;
 }
 
-.score-box.changed {
-  animation: scoreChange 0.65s ease;
+.score {
+  min-width: clamp(42px, 5vw, 68px);
+
+  color: white;
+  font-size: clamp(32px, 5vw, 62px);
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
-@keyframes scoreChange {
+.separator {
+  color: var(--cyan);
+  font-size: clamp(25px, 3.5vw, 42px);
+  font-weight: 300;
+}
+
+.score.changed {
+  animation: scorePop 0.45s ease;
+}
+
+@keyframes scorePop {
   0% {
     transform: scale(1);
+    color: white;
   }
 
-  35% {
-    transform: scale(1.25);
-    box-shadow:
-      0 0 25px var(--cyan),
-      0 0 45px var(--blue);
+  45% {
+    transform: scale(1.22);
+    color: var(--cyan);
   }
 
   100% {
     transform: scale(1);
+    color: white;
   }
 }
 
-/* =========================================
-   7. ZENTRALES FEDERBALL-EMBLEM
-========================================= */
+/* ==================================
+   FEDERBALL ICON
+================================== */
 
-.center-emblem {
-  position: relative;
-  z-index: 6;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  width: 100%;
-  aspect-ratio: 1 / 1;
-
-  border-radius: 50%;
-
-  background:
-    radial-gradient(
-      circle,
-      #0b4261 0%,
-      #061a30 62%,
-      #020914 100%
-    );
-
-  border: 3px solid var(--cyan);
-
-  box-shadow:
-    0 0 12px var(--cyan),
-    0 0 30px rgba(0, 234, 255, 0.6),
-    inset 0 0 18px rgba(0, 234, 255, 0.3);
-}
-
-.center-emblem::before,
-.center-emblem::after {
-  content: "";
+.shuttlecock {
   position: absolute;
-  inset: -9px;
+  right: 10px;
+  bottom: 8px;
 
-  border: 2px solid rgba(0, 234, 255, 0.55);
-  border-radius: 50%;
+  width: 19px;
+  height: 19px;
+
+  opacity: 0.35;
 }
 
-.center-emblem::before {
-  animation: orbit 8s linear infinite;
-}
-
-.center-emblem::after {
-  inset: -15px;
-  border-style: dashed;
-  opacity: 0.6;
-
-  animation: orbit 16s linear infinite reverse;
-}
-
-@keyframes orbit {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.shuttlecock-icon {
-  width: 65%;
-  height: 65%;
-
-  filter:
-    drop-shadow(0 0 8px rgba(0, 234, 255, 0.75));
-}
-
-/* =========================================
-   8. DEKORATIVE LICHTAKZENTE
-========================================= */
-
-.accent {
-  position: absolute;
-  height: 4px;
-  width: 65px;
-
-  background: var(--cyan);
-  box-shadow: 0 0 12px var(--cyan);
-
-  border-radius: 10px;
-}
-
-.accent-left {
-  left: 5%;
-  bottom: 12px;
-}
-
-.accent-right {
-  right: 5%;
-  top: 12px;
-}
-
-.accent-left,
-.accent-right {
-  animation: accentGlow 2s ease-in-out infinite alternate;
-}
-
-@keyframes accentGlow {
-  from {
-    opacity: 0.4;
-    width: 35px;
-  }
-
-  to {
-    opacity: 1;
-    width: 85px;
-  }
-}
-
-/* =========================================
-   9. FEDERBALL-ANIMATION AM RECHTEN RAND
-========================================= */
-
-.floating-shuttle {
-  position: absolute;
-  right: 2%;
-  top: 50%;
-
-  width: clamp(24px, 4vw, 55px);
-
-  transform: translateY(-50%) rotate(25deg);
-
-  z-index: 3;
-  opacity: 0.9;
-
-  animation: shuttleFloat 3s ease-in-out infinite;
-}
-
-@keyframes shuttleFloat {
-  0%, 100% {
-    transform: translateY(-50%) rotate(25deg);
-  }
-
-  50% {
-    transform: translateY(-62%) rotate(32deg);
-  }
-}
-
-/* =========================================
-   10. RESPONSIVE DARSTELLUNG
-========================================= */
+/* ==================================
+   MOBILE
+================================== */
 
 @media (max-width: 650px) {
-
   #display {
     padding: 5px;
   }
 
   .scoreboard {
-    min-height: 90px;
-
-    grid-template-columns:
-      minmax(0, 1fr)
-      48px
-      65px
-      48px
-      minmax(0, 1fr);
-
-    padding: 12px 5px;
+    gap: 7px;
+    padding: 17px 9px 12px;
+    border-radius: 8px;
   }
 
-  .team-name {
-    font-size: clamp(10px, 2.4vw, 15px);
+  .team {
+    font-size: clamp(10px, 2.5vw, 15px);
     white-space: normal;
+    line-height: 1.2;
   }
 
-  .score-box {
-    border-radius: 9px;
-    font-size: 30px;
+  .score-area {
+    gap: 4px;
   }
 
-  .live-badge {
-    top: -8px;
-    left: 8px;
-    padding: 4px 8px;
-    font-size: 10px;
+  .score {
+    min-width: 29px;
+    font-size: clamp(25px, 6vw, 38px);
   }
 
-  .live-dot {
-    width: 6px;
-    height: 6px;
+  .separator {
+    font-size: 23px;
   }
 
-  .home-team {
-    padding-left: 4px;
-  }
-
-  .guest-team {
-    padding-right: 4px;
-  }
-
-  .floating-shuttle {
-    display: none;
+  .live {
+    left: 10px;
+    font-size: 9px;
+    padding: 3px 7px;
   }
 }
 
-/* =========================================
-   11. STEUERUNGSSEITE
-========================================= */
+/* ==================================
+   STEUERUNG
+================================== */
 
 #control {
   display: none;
-
   min-height: 100vh;
-  padding: 25px;
-
-  background:
-    radial-gradient(
-      circle at top,
-      #123b5b,
-      #07111e 60%
-    );
+  padding: 20px;
 
   color: white;
+  background: #0d1724;
   text-align: center;
-  line-height: normal;
 }
 
-.control-card {
-  max-width: 700px;
+.card {
+  width: 100%;
+  max-width: 650px;
   margin: 30px auto;
   padding: 25px;
 
-  background: rgba(7, 24, 39, 0.95);
-
-  border: 1px solid rgba(0, 234, 255, 0.5);
-  border-radius: 18px;
-
-  box-shadow: 0 0 25px rgba(0, 234, 255, 0.15);
+  background: #17283a;
+  border: 1px solid #29445c;
+  border-radius: 14px;
 }
 
-#login {
-  max-width: 420px;
-  margin: 60px auto;
+.card h1 {
+  margin-top: 5px;
 }
 
-#login input {
-  display: block;
+input {
   width: 100%;
+  padding: 13px;
+  margin: 9px 0;
 
-  padding: 15px;
-  margin: 15px 0;
+  color: #142233;
+  background: white;
 
-  border-radius: 10px;
-  border: 1px solid #456078;
+  border: 1px solid #9baabb;
+  border-radius: 8px;
 
-  font-size: 17px;
+  font-size: 16px;
 }
 
 button {
-  padding: 14px 22px;
+  padding: 12px 20px;
   margin: 5px;
 
+  color: white;
+  background: #1686c9;
+
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
 
-  font-size: 19px;
+  font-size: 17px;
   font-weight: bold;
-
   cursor: pointer;
 }
 
-.login-button,
-.plus {
-  color: white;
-  background: #087cff;
+button:active {
+  transform: scale(0.97);
 }
 
 .minus,
-.reset,
 .logout {
-  color: white;
-  background: #263b50;
+  background: #35485d;
 }
 
-.teams {
+.reset {
+  background: #a83240;
+}
+
+.teams-control {
   display: flex;
   gap: 15px;
 }
@@ -595,153 +345,112 @@ button {
 .team-control {
   flex: 1;
   min-width: 0;
-  padding: 15px 5px;
+  padding: 12px 5px;
 
-  border: 1px solid rgba(0, 234, 255, 0.35);
-  border-radius: 12px;
+  background: #101d2c;
+  border: 1px solid #29445c;
+  border-radius: 10px;
 }
 
 .team-control h3 {
-  font-size: 16px;
-  min-height: 40px;
+  min-height: 38px;
+  font-size: 15px;
 }
 
 .control-score {
-  font-size: 60px;
-  font-weight: 900;
   margin: 15px 0;
+  font-size: 52px;
+  font-weight: 900;
 }
 
-#status {
-  color: #9db4c8;
-  font-size: 14px;
+.section-title {
+  margin-top: 28px;
+  margin-bottom: 10px;
+  text-align: left;
+  font-size: 16px;
+  color: var(--cyan);
 }
 
 #error {
-  color: #ff7777;
+  color: #ff8c8c;
 }
 
-@media (max-width: 500px) {
+#status {
+  color: #a9bacb;
+  font-size: 13px;
+}
+
+@media (max-width: 480px) {
   #control {
-    padding: 12px;
+    padding: 8px;
   }
 
-  .control-card {
-    padding: 12px;
+  .card {
+    padding: 14px;
   }
 
   .team-control h3 {
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .control-score {
-    font-size: 45px;
+    font-size: 42px;
   }
 
   button {
-    padding: 12px 15px;
-    font-size: 17px;
+    padding: 11px 13px;
+    font-size: 15px;
   }
 }
-
 </style>
 </head>
 
 <body>
 
-<!-- =====================================
+<!-- ==================================
      ÖFFENTLICHES SCOREBOARD
-===================================== -->
+================================== -->
 
 <div id="display">
 
   <div class="scoreboard">
 
-    <div class="live-badge">
+    <div class="live">
       <span class="live-dot"></span>
       LIVE
     </div>
 
-    <div class="team-name home-team">
+    <div class="team home-team">
       SG Brietlingen-Adendorf
     </div>
 
-    <div class="score-box" id="homeDisplay">
-      0
+    <div class="score-area">
+      <div class="score" id="homeDisplay">0</div>
+      <div class="separator">:</div>
+      <div class="score" id="guestDisplay">0</div>
     </div>
 
-    <div class="center-emblem">
-
-      <svg class="shuttlecock-icon"
-           viewBox="0 0 100 100"
-           xmlns="http://www.w3.org/2000/svg"
-           aria-label="Badminton Federball">
-
-        <g fill="none"
-           stroke="#ffffff"
-           stroke-width="5"
-           stroke-linecap="round"
-           stroke-linejoin="round">
-
-          <path d="M50 76 L20 27"/>
-          <path d="M50 76 L35 15"/>
-          <path d="M50 76 L50 10"/>
-          <path d="M50 76 L65 15"/>
-          <path d="M50 76 L80 27"/>
-
-          <path d="M20 27 Q50 2 80 27"/>
-
-        </g>
-
-        <path
-          d="M35 72 Q50 62 65 72 L59 91 Q50 99 41 91 Z"
-          fill="#ffffff"
-          stroke="#00eaff"
-          stroke-width="3"
-        />
-
-        <path
-          d="M42 77 L58 77"
-          stroke="#087cff"
-          stroke-width="3"
-        />
-
-      </svg>
-
+    <div class="team guest-team" id="opponentDisplay">
+      Gegner
     </div>
 
-    <div class="score-box" id="guestDisplay">
-      0
-    </div>
-
-    <div class="team-name guest-team">
-      BSG Wallhöfen/Ihlpohl
-    </div>
-
-    <div class="accent accent-left"></div>
-    <div class="accent accent-right"></div>
-
-    <svg class="floating-shuttle"
+    <svg class="shuttlecock"
          viewBox="0 0 100 100"
-         xmlns="http://www.w3.org/2000/svg">
-
-      <g fill="none"
-         stroke="#ffffff"
-         stroke-width="5"
+         fill="none"
+         stroke="#35c9e8"
+         stroke-width="6"
          stroke-linecap="round">
 
-        <path d="M50 78 L18 25"/>
-        <path d="M50 78 L35 12"/>
-        <path d="M50 78 L65 12"/>
-        <path d="M50 78 L82 25"/>
-        <path d="M18 25 Q50 0 82 25"/>
+      <path d="M50 72 L20 25"/>
+      <path d="M50 72 L35 12"/>
+      <path d="M50 72 L50 8"/>
+      <path d="M50 72 L65 12"/>
+      <path d="M50 72 L80 25"/>
+      <path d="M20 25 Q50 0 80 25"/>
 
-      </g>
-
-      <path
-        d="M38 73 Q50 64 62 73 L58 92 Q50 100 42 92 Z"
-        fill="#ffffff"
-      />
+      <path d="M38 70 Q50 60 62 70 L58 92 Q50 100 42 92 Z"
+            fill="#35c9e8"
+            stroke="none"/>
 
     </svg>
 
@@ -750,13 +459,13 @@ button {
 </div>
 
 
-<!-- =====================================
-     ADMIN / STEUERUNG
-===================================== -->
+<!-- ==================================
+     ADMIN STEUERUNG
+================================== -->
 
 <div id="control">
 
-  <div id="login" class="control-card">
+  <div id="login" class="card">
 
     <h1>🏸 Scoreboard Login</h1>
 
@@ -765,24 +474,22 @@ button {
     <form id="loginForm">
 
       <input
-        type="email"
         id="email"
+        type="email"
         placeholder="E-Mail-Adresse"
         autocomplete="username"
         required
       >
 
       <input
-        type="password"
         id="password"
+        type="password"
         placeholder="Passwort"
         autocomplete="current-password"
         required
       >
 
-      <button class="login-button" type="submit">
-        Anmelden
-      </button>
+      <button type="submit">Anmelden</button>
 
     </form>
 
@@ -791,13 +498,39 @@ button {
   </div>
 
 
-  <div id="controlPanel" class="control-card">
+  <div id="controlPanel" class="card">
 
-    <h1>Live-Spielstand</h1>
+    <h1>Spielstandssteuerung</h1>
 
-    <p>Steuerung des Mannschaftsspiels</p>
+    <p>SG Brietlingen-Adendorf</p>
 
-    <div class="teams">
+    <!-- Gegnername ändern -->
+
+    <div class="section-title">
+      Gegnerische Mannschaft
+    </div>
+
+    <input
+      id="opponentInput"
+      type="text"
+      placeholder="Name der gegnerischen Mannschaft"
+      maxlength="60"
+    >
+
+    <button onclick="saveOpponent()">
+      Gegnernamen speichern
+    </button>
+
+    <p id="opponentStatus"></p>
+
+
+    <!-- Spielstände -->
+
+    <div class="section-title">
+      Mannschaftsspielstand
+    </div>
+
+    <div class="teams-control">
 
       <div class="team-control">
 
@@ -807,14 +540,12 @@ button {
           0
         </div>
 
-        <button
-          class="minus"
+        <button class="minus"
           onclick="changeScore('home', -1)">
           −
         </button>
 
         <button
-          class="plus"
           onclick="changeScore('home', 1)">
           +
         </button>
@@ -824,20 +555,20 @@ button {
 
       <div class="team-control">
 
-        <h3>BSG Wallhöfen/Ihlpohl</h3>
+        <h3 id="opponentControlName">
+          Gegner
+        </h3>
 
         <div class="control-score" id="guestControl">
           0
         </div>
 
-        <button
-          class="minus"
+        <button class="minus"
           onclick="changeScore('guest', -1)">
           −
         </button>
 
         <button
-          class="plus"
           onclick="changeScore('guest', 1)">
           +
         </button>
@@ -863,200 +594,146 @@ button {
 </div>
 
 
-<!-- =====================================
-     FIREBASE VERBINDUNG
-===================================== -->
+<!-- ==================================
+     FIREBASE
+================================== -->
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
-
 <script>
 
-/* =====================================
-   FIREBASE KONFIGURATION
-===================================== */
+/* FIREBASE KONFIGURATION */
 
 const firebaseConfig = {
-
   apiKey: "AIzaSyDhYBRhGo3jlKSjullTBQaprgaoSPA7dXk",
-
-  authDomain:
-    "badminton-scoreboard-5c4b4.firebaseapp.com",
-
-  databaseURL:
-    "https://badminton-scoreboard-5c4b4-default-rtdb.europe-west1.firebasedatabase.app",
-
-  projectId:
-    "badminton-scoreboard-5c4b4",
-
-  storageBucket:
-    "badminton-scoreboard-5c4b4.firebasestorage.app",
-
-  messagingSenderId:
-    "257689447899",
-
-  appId:
-    "1:257689447899:web:37fd7d47ff7c5e0eae4bfe"
-
+  authDomain: "badminton-scoreboard-5c4b4.firebaseapp.com",
+  databaseURL: "https://badminton-scoreboard-5c4b4-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "badminton-scoreboard-5c4b4",
+  storageBucket: "badminton-scoreboard-5c4b4.firebasestorage.app",
+  messagingSenderId: "257689447899",
+  appId: "1:257689447899:web:37fd7d47ff7c5e0eae4bfe"
 };
 
-
-/* Nur dieser Firebase-Benutzer darf steuern */
-
 const allowedUID = "NWl3lBL8XEZBiQKniVsIXiKsHB73";
-
-
-/* =====================================
-   FIREBASE STARTEN
-===================================== */
 
 firebase.initializeApp(firebaseConfig);
 
 const auth = firebase.auth();
-
 const database = firebase.database();
 
 const scoreRef =
   database.ref("matches/badminton1");
 
 
-/* =====================================
-   SEITE ERKENNEN
-===================================== */
-
-const params = new URLSearchParams(
-  window.location.search
-);
+/* SEITE ERKENNEN */
 
 const isControl =
-  params.get("control") === "1";
+  new URLSearchParams(location.search).get("control") === "1";
+
+const display = document.getElementById("display");
+const control = document.getElementById("control");
+const login = document.getElementById("login");
+const controlPanel = document.getElementById("controlPanel");
 
 
-const display =
-  document.getElementById("display");
+/* NAMEN UND SPIELSTÄNDE AKTUALISIEREN */
 
-const control =
-  document.getElementById("control");
+function updateScore(data) {
 
-const login =
-  document.getElementById("login");
-
-const controlPanel =
-  document.getElementById("controlPanel");
-
-
-/* =====================================
-   ZAHLEN ANZEIGEN
-===================================== */
-
-function updateScore(score) {
-
-  const home = Number(score.home ?? 0);
-  const guest = Number(score.guest ?? 0);
+  const home = Number(data.home ?? 0);
+  const guest = Number(data.guest ?? 0);
+  const opponent = String(data.opponent || "Gegner");
 
   updateNumber("homeDisplay", home);
   updateNumber("guestDisplay", guest);
 
-  document.getElementById("homeControl").textContent =
-    home;
+  document.getElementById("homeControl").textContent = home;
+  document.getElementById("guestControl").textContent = guest;
 
-  document.getElementById("guestControl").textContent =
-    guest;
+  document.getElementById("opponentDisplay").textContent =
+    opponent;
 
+  document.getElementById("opponentControlName").textContent =
+    opponent;
+
+  const input = document.getElementById("opponentInput");
+
+  if (document.activeElement !== input) {
+    input.value = opponent;
+  }
 }
 
 
-/* =====================================
-   ZAHLEN-ANIMATION
-===================================== */
+/* ZAHLENANIMATION */
 
-function updateNumber(id, newValue) {
+function updateNumber(id, value) {
 
   const element = document.getElementById(id);
 
-  const oldValue = element.textContent;
+  if (element.textContent !== String(value)) {
 
-  if (oldValue !== String(newValue)) {
-
-    element.textContent = newValue;
+    element.textContent = value;
 
     element.classList.remove("changed");
 
-    /* Animation neu starten */
     void element.offsetWidth;
 
     element.classList.add("changed");
 
   }
-
 }
 
 
-/* =====================================
-   ÖFFENTLICHE ANZEIGE
-===================================== */
+/* ÖFFENTLICHE ANZEIGE */
 
 if (!isControl) {
-
-  display.style.display = "block";
-
-  control.style.display = "none";
 
   scoreRef.on("value", snapshot => {
 
     updateScore(
       snapshot.val() || {
         home: 0,
-        guest: 0
+        guest: 0,
+        opponent: "Gegner"
       }
     );
 
   }, error => {
-
-    console.error("Firebase Fehler:", error);
-
+    console.error("Firebase:", error);
   });
 
 }
 
 
-/* =====================================
-   ADMIN BEREICH
-===================================== */
+/* ADMIN BEREICH */
 
 if (isControl) {
 
   display.style.display = "none";
-
   control.style.display = "block";
-
-
-  /* LOGIN STATUS PRÜFEN */
 
   auth.onAuthStateChanged(async user => {
 
     if (user && user.uid === allowedUID) {
 
       login.style.display = "none";
-
       controlPanel.style.display = "block";
 
       document.getElementById("status").textContent =
-        "🟢 Mit Firebase verbunden";
-
+        "Verbunden mit Firebase";
 
       try {
 
-        const snapshot =
-          await scoreRef.once("value");
+        const snapshot = await scoreRef.once("value");
 
         if (!snapshot.exists()) {
 
           await scoreRef.set({
             home: 0,
-            guest: 0
+            guest: 0,
+            opponent: "Gegner"
           });
 
         }
@@ -1066,7 +743,8 @@ if (isControl) {
           updateScore(
             snapshot.val() || {
               home: 0,
-              guest: 0
+              guest: 0,
+              opponent: "Gegner"
             }
           );
 
@@ -1075,20 +753,15 @@ if (isControl) {
       } catch (error) {
 
         document.getElementById("status").textContent =
-          "Verbindungsfehler: " + error.message;
+          "Fehler: " + error.message;
 
       }
 
     } else {
 
-      if (user) {
-
-        await auth.signOut();
-
-      }
+      if (user) await auth.signOut();
 
       login.style.display = "block";
-
       controlPanel.style.display = "none";
 
     }
@@ -1096,12 +769,9 @@ if (isControl) {
   });
 
 
-  /* =====================================
-     ANMELDEN
-  ===================================== */
+  /* LOGIN */
 
-  document
-    .getElementById("loginForm")
+  document.getElementById("loginForm")
     .addEventListener("submit", async event => {
 
       event.preventDefault();
@@ -1109,32 +779,21 @@ if (isControl) {
       const errorElement =
         document.getElementById("error");
 
-      errorElement.textContent =
-        "Anmeldung läuft ...";
+      errorElement.textContent = "Anmeldung läuft ...";
 
       try {
 
-        const email =
-          document.getElementById("email").value;
-
-        const password =
-          document.getElementById("password").value;
-
-
         const result =
           await auth.signInWithEmailAndPassword(
-            email,
-            password
+            document.getElementById("email").value,
+            document.getElementById("password").value
           );
-
 
         if (result.user.uid !== allowedUID) {
 
           await auth.signOut();
 
-          throw new Error(
-            "Dieses Konto hat keinen Zugriff."
-          );
+          throw new Error("Kein Zugriff auf die Steuerung.");
 
         }
 
@@ -1143,7 +802,7 @@ if (isControl) {
       } catch (error) {
 
         errorElement.textContent =
-          "Fehler: " + error.message;
+          "Anmeldung fehlgeschlagen: " + error.message;
 
       }
 
@@ -1152,9 +811,7 @@ if (isControl) {
 }
 
 
-/* =====================================
-   SPIELSTAND ÄNDERN
-===================================== */
+/* SPIELSTAND ÄNDERN */
 
 function changeScore(team, amount) {
 
@@ -1162,26 +819,60 @@ function changeScore(team, amount) {
     !isControl ||
     !auth.currentUser ||
     auth.currentUser.uid !== allowedUID
-  ) {
-
-    return;
-
-  }
+  ) return;
 
   scoreRef.child(team).transaction(current => {
 
-    const value = Number(current || 0);
-
-    return Math.max(0, value + amount);
+    return Math.max(0, Number(current || 0) + amount);
 
   });
 
 }
 
 
-/* =====================================
-   SPIELSTAND ZURÜCKSETZEN
-===================================== */
+/* GEGNERNAMEN SPEICHERN */
+
+async function saveOpponent() {
+
+  if (
+    !isControl ||
+    !auth.currentUser ||
+    auth.currentUser.uid !== allowedUID
+  ) return;
+
+  const input =
+    document.getElementById("opponentInput");
+
+  const opponent = input.value.trim();
+
+  const status =
+    document.getElementById("opponentStatus");
+
+  if (!opponent) {
+
+    status.textContent = "Bitte einen Namen eingeben.";
+    return;
+
+  }
+
+  try {
+
+    await scoreRef.child("opponent").set(opponent);
+
+    status.textContent =
+      "Gegnername erfolgreich gespeichert.";
+
+  } catch (error) {
+
+    status.textContent =
+      "Fehler beim Speichern: " + error.message;
+
+  }
+
+}
+
+
+/* SPIELSTAND ZURÜCKSETZEN */
 
 function resetScore() {
 
@@ -1189,37 +880,25 @@ function resetScore() {
     !isControl ||
     !auth.currentUser ||
     auth.currentUser.uid !== allowedUID
-  ) {
+  ) return;
 
-    return;
+  if (confirm("Spielstand wirklich zurücksetzen?")) {
+
+    scoreRef.update({
+      home: 0,
+      guest: 0
+    });
 
   }
-
-  const confirmed = confirm(
-    "Möchtest du den Mannschaftsspielstand wirklich zurücksetzen?"
-  );
-
-  if (!confirmed) return;
-
-  scoreRef.set({
-
-    home: 0,
-
-    guest: 0
-
-  });
 
 }
 
 
-/* =====================================
-   ABMELDEN
-===================================== */
+/* ABMELDEN */
 
 function logout() {
 
   scoreRef.off();
-
   auth.signOut();
 
 }
