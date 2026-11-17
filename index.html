@@ -1,0 +1,316 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Badminton Spielstand</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+#display {
+  background: transparent;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  min-height: 100vh;
+  font-size: clamp(60px, 12vw, 110px);
+  font-weight: 900;
+  text-shadow: 0 2px 8px #000;
+}
+
+#control {
+  display: none;
+  min-height: 100vh;
+  background: #101827;
+  color: white;
+  padding: 25px;
+  text-align: center;
+}
+
+#login {
+  max-width: 420px;
+  margin: 50px auto;
+}
+
+#login input {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  margin: 12px 0;
+  border-radius: 10px;
+  border: 1px solid #526176;
+  font-size: 17px;
+}
+
+#login button {
+  width: 100%;
+  background: #168cff;
+  color: white;
+  font-size: 18px;
+}
+
+#controlPanel { display: none; }
+
+#control h1 { font-size: 25px; }
+
+.teams {
+  display: flex;
+  justify-content: space-around;
+  gap: 15px;
+}
+
+.team { flex: 1; }
+
+.score {
+  font-size: 65px;
+  font-weight: bold;
+  margin: 18px 0;
+}
+
+button {
+  border: 0;
+  border-radius: 14px;
+  padding: 15px 25px;
+  font-size: 28px;
+  font-weight: bold;
+  margin: 5px;
+}
+
+.plus { background: #168cff; color: white; }
+.minus { background: #303d50; color: white; }
+
+.reset {
+  margin-top: 35px;
+  font-size: 16px;
+  background: #303d50;
+  color: white;
+}
+
+.logout {
+  margin-top: 15px;
+  font-size: 15px;
+  background: #303d50;
+  color: white;
+}
+
+#status {
+  font-size: 13px;
+  color: #aab6c8;
+}
+
+#error {
+  color: #ff7777;
+  font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="display">
+  <span id="homeDisplay">0</span>
+  <span>:</span>
+  <span id="guestDisplay">0</span>
+</div>
+
+<div id="control">
+
+  <div id="login">
+    <h1>Scoreboard Login</h1>
+    <p>Bitte melde dich an, um den Spielstand zu steuern.</p>
+
+    <form id="loginForm">
+      <input
+        id="email"
+        type="email"
+        placeholder="E-Mail-Adresse"
+        autocomplete="username"
+        required
+      >
+
+      <input
+        id="password"
+        type="password"
+        placeholder="Passwort"
+        autocomplete="current-password"
+        required
+      >
+
+      <button type="submit">Anmelden</button>
+    </form>
+
+    <p id="error"></p>
+  </div>
+
+  <div id="controlPanel">
+    <h1>Spielstand steuern</h1>
+
+    <div class="teams">
+      <div class="team">
+        <h3>Heim</h3>
+        <div class="score" id="homeControl">0</div>
+        <button class="minus" onclick="changeScore('home',-1)">−</button>
+        <button class="plus" onclick="changeScore('home',1)">+</button>
+      </div>
+
+      <div class="team">
+        <h3>Gast</h3>
+        <div class="score" id="guestControl">0</div>
+        <button class="minus" onclick="changeScore('guest',-1)">−</button>
+        <button class="plus" onclick="changeScore('guest',1)">+</button>
+      </div>
+    </div>
+
+    <button class="reset" onclick="resetScore()">
+      Spielstand zurücksetzen
+    </button>
+
+    <p id="status">Verbunden</p>
+
+    <button class="logout" onclick="logout()">Abmelden</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDhYBRhGo3jlKSjullTBQaprgaoSPA7dXk",
+  authDomain: "badminton-scoreboard-5c4b4.firebaseapp.com",
+  databaseURL: "https://badminton-scoreboard-5c4b4-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "badminton-scoreboard-5c4b4",
+  storageBucket: "badminton-scoreboard-5c4b4.firebasestorage.app",
+  messagingSenderId: "257689447899",
+  appId: "1:257689447899:web:37fd7d47ff7c5e0eae4bfe"
+};
+
+const allowedUID = "NWl3lBL8XEZBiQKniVsIXiKsHB73";
+
+const isControl =
+  new URLSearchParams(location.search).get("control") === "1";
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.database();
+const scoreRef = db.ref("matches/badminton1");
+
+const display = document.getElementById("display");
+const control = document.getElementById("control");
+const login = document.getElementById("login");
+const controlPanel = document.getElementById("controlPanel");
+
+function updateScore(score) {
+  const home = score.home ?? 0;
+  const guest = score.guest ?? 0;
+
+  document.getElementById("homeDisplay").textContent = home;
+  document.getElementById("guestDisplay").textContent = guest;
+
+  document.getElementById("homeControl").textContent = home;
+  document.getElementById("guestControl").textContent = guest;
+}
+
+// Öffentliche Anzeige für PRISM
+if (!isControl) {
+  scoreRef.on("value", snapshot => {
+    updateScore(snapshot.val() || {home: 0, guest: 0});
+  });
+}
+
+// Steuerungsseite
+if (isControl) {
+  display.style.display = "none";
+  control.style.display = "block";
+
+  auth.onAuthStateChanged(async user => {
+    if (user && user.uid === allowedUID) {
+      login.style.display = "none";
+      controlPanel.style.display = "block";
+
+      document.getElementById("status").textContent = "Verbunden";
+
+      const snapshot = await scoreRef.once("value");
+
+      if (!snapshot.exists()) {
+        await scoreRef.set({home: 0, guest: 0});
+      }
+
+      scoreRef.on("value", snapshot => {
+        updateScore(snapshot.val() || {home: 0, guest: 0});
+      });
+
+    } else {
+      if (user) {
+        await auth.signOut();
+      }
+
+      login.style.display = "block";
+      controlPanel.style.display = "none";
+    }
+  });
+
+  document.getElementById("loginForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    document.getElementById("error").textContent = "Anmeldung läuft ...";
+
+    try {
+      const result = await auth.signInWithEmailAndPassword(email, password);
+
+      if (result.user.uid !== allowedUID) {
+        await auth.signOut();
+        throw new Error("Dieses Konto hat keinen Zugriff.");
+      }
+
+      document.getElementById("error").textContent = "";
+
+    } catch (error) {
+      document.getElementById("error").textContent =
+        "Anmeldung fehlgeschlagen: " + error.message;
+    }
+  });
+}
+
+function changeScore(team, amount) {
+  if (!isControl || !auth.currentUser || auth.currentUser.uid !== allowedUID) {
+    return;
+  }
+
+  scoreRef.child(team).transaction(current =>
+    Math.max(0, (current || 0) + amount)
+  );
+}
+
+function resetScore() {
+  if (!isControl || !auth.currentUser || auth.currentUser.uid !== allowedUID) {
+    return;
+  }
+
+  if (confirm("Spielstand wirklich zurücksetzen?")) {
+    scoreRef.set({home: 0, guest: 0});
+  }
+}
+
+function logout() {
+  scoreRef.off();
+  auth.signOut();
+}
+</script>
+
+</body>
+</html>
