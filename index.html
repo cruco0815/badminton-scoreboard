@@ -1,0 +1,309 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SG Brietlingen-Adendorf – Live-Spielstand</title>
+
+<style>
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  width: 100%;
+  min-height: 100%;
+  background: transparent;
+  font-family: Arial, sans-serif;
+}
+
+#display {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+}
+
+.banner {
+  position: relative;
+  width: 100%;
+  max-width: 2200px;
+  margin: 0 auto;
+  line-height: 0;
+  overflow: hidden;
+}
+
+.banner img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.score {
+  position: absolute;
+  top: 37.1%;
+  height: 14.7%;
+  width: 5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #07172a;
+  font-weight: 900;
+  font-size: clamp(18px, 4.3vw, 78px);
+  line-height: 1;
+  pointer-events: none;
+}
+
+#homeDisplay { left: 37.9%; }
+#guestDisplay { left: 53.1%; }
+
+#control {
+  display: none;
+  min-height: 100vh;
+  background: #101827;
+  color: white;
+  padding: 24px;
+  text-align: center;
+  line-height: normal;
+}
+
+#login {
+  max-width: 420px;
+  margin: 50px auto;
+}
+
+#login input {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  margin: 12px 0;
+  border-radius: 10px;
+  border: 1px solid #526176;
+  font-size: 17px;
+}
+
+button {
+  border: 0;
+  border-radius: 14px;
+  padding: 15px 25px;
+  font-size: 22px;
+  font-weight: bold;
+  margin: 5px;
+}
+
+#login button, .plus {
+  background: #168cff;
+  color: white;
+}
+
+#controlPanel { display: none; }
+
+.teams {
+  display: flex;
+  justify-content: space-around;
+  gap: 15px;
+}
+
+.team {
+  flex: 1;
+  min-width: 0;
+}
+
+.controlScore {
+  font-size: 65px;
+  font-weight: bold;
+  margin: 18px 0;
+}
+
+.minus, .reset, .logout {
+  background: #303d50;
+  color: white;
+}
+
+#error { color: #ff7777; }
+#status { font-size: 13px; color: #aab6c8; }
+</style>
+</head>
+
+<body>
+
+<div id="display">
+  <div class="banner">
+    <img src="./banner.png?v=3"
+         alt="SG Brietlingen-Adendorf gegen BSG Wallhöfen/Ihlpohl">
+
+    <div class="score" id="homeDisplay">0</div>
+    <div class="score" id="guestDisplay">0</div>
+  </div>
+</div>
+
+<div id="control">
+
+  <div id="login">
+    <h1>Scoreboard Login</h1>
+    <p>Bitte melde dich an, um den Spielstand zu steuern.</p>
+
+    <form id="loginForm">
+      <input id="email" type="email"
+             placeholder="E-Mail-Adresse"
+             autocomplete="username" required>
+
+      <input id="password" type="password"
+             placeholder="Passwort"
+             autocomplete="current-password" required>
+
+      <button type="submit">Anmelden</button>
+    </form>
+
+    <p id="error"></p>
+  </div>
+
+  <div id="controlPanel">
+    <h1>Mannschaftsspielstand steuern</h1>
+
+    <div class="teams">
+      <div class="team">
+        <h3>SG Brietlingen-Adendorf</h3>
+        <div class="controlScore" id="homeControl">0</div>
+        <button class="minus" onclick="changeScore('home',-1)">−</button>
+        <button class="plus" onclick="changeScore('home',1)">+</button>
+      </div>
+
+      <div class="team">
+        <h3>BSG Wallhöfen/Ihlpohl</h3>
+        <div class="controlScore" id="guestControl">0</div>
+        <button class="minus" onclick="changeScore('guest',-1)">−</button>
+        <button class="plus" onclick="changeScore('guest',1)">+</button>
+      </div>
+    </div>
+
+    <button class="reset" onclick="resetScore()">
+      Spielstand zurücksetzen
+    </button>
+
+    <p id="status">Verbunden</p>
+
+    <button class="logout" onclick="logout()">Abmelden</button>
+  </div>
+
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDhYBRhGo3jlKSjullTBQaprgaoSPA7dXk",
+  authDomain: "badminton-scoreboard-5c4b4.firebaseapp.com",
+  databaseURL: "https://badminton-scoreboard-5c4b4-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "badminton-scoreboard-5c4b4",
+  storageBucket: "badminton-scoreboard-5c4b4.firebasestorage.app",
+  messagingSenderId: "257689447899",
+  appId: "1:257689447899:web:37fd7d47ff7c5e0eae4bfe"
+};
+
+const allowedUID = "NWl3lBL8XEZBiQKniVsIXiKsHB73";
+const isControl = new URLSearchParams(location.search).get("control") === "1";
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const scoreRef = firebase.database().ref("matches/badminton1");
+
+const display = document.getElementById("display");
+const control = document.getElementById("control");
+const login = document.getElementById("login");
+const controlPanel = document.getElementById("controlPanel");
+
+function updateScore(score) {
+  const home = score.home ?? 0;
+  const guest = score.guest ?? 0;
+
+  document.getElementById("homeDisplay").textContent = home;
+  document.getElementById("guestDisplay").textContent = guest;
+  document.getElementById("homeControl").textContent = home;
+  document.getElementById("guestControl").textContent = guest;
+}
+
+if (!isControl) {
+  scoreRef.on("value", s => updateScore(s.val() || {home: 0, guest: 0}));
+}
+
+if (isControl) {
+  display.style.display = "none";
+  control.style.display = "block";
+
+  auth.onAuthStateChanged(async user => {
+    if (user && user.uid === allowedUID) {
+      login.style.display = "none";
+      controlPanel.style.display = "block";
+
+      document.getElementById("status").textContent = "Verbunden";
+
+      const s = await scoreRef.once("value");
+
+      if (!s.exists()) {
+        await scoreRef.set({home: 0, guest: 0});
+      }
+
+      scoreRef.on("value", s =>
+        updateScore(s.val() || {home: 0, guest: 0})
+      );
+    } else {
+      if (user) await auth.signOut();
+
+      login.style.display = "block";
+      controlPanel.style.display = "none";
+    }
+  });
+
+  document.getElementById("loginForm").addEventListener("submit", async e => {
+    e.preventDefault();
+
+    const error = document.getElementById("error");
+    error.textContent = "Anmeldung läuft ...";
+
+    try {
+      const result = await auth.signInWithEmailAndPassword(
+        document.getElementById("email").value,
+        document.getElementById("password").value
+      );
+
+      if (result.user.uid !== allowedUID) {
+        await auth.signOut();
+        throw new Error("Dieses Konto hat keinen Zugriff.");
+      }
+
+      error.textContent = "";
+
+    } catch (err) {
+      error.textContent = "Anmeldung fehlgeschlagen: " + err.message;
+    }
+  });
+}
+
+function changeScore(team, amount) {
+  if (!isControl || !auth.currentUser || auth.currentUser.uid !== allowedUID) return;
+
+  scoreRef.child(team).transaction(current =>
+    Math.max(0, (current || 0) + amount)
+  );
+}
+
+function resetScore() {
+  if (!isControl || !auth.currentUser || auth.currentUser.uid !== allowedUID) return;
+
+  if (confirm("Spielstand wirklich zurücksetzen?")) {
+    scoreRef.set({home: 0, guest: 0});
+  }
+}
+
+function logout() {
+  scoreRef.off();
+  auth.signOut();
+}
+</script>
+
+</body>
+</html>
