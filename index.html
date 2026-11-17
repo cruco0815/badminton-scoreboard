@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Badminton Spielstand</title>
+<title>SG Brietlingen-Adendorf Scoreboard</title>
 
 <style>
 * { box-sizing: border-box; }
@@ -12,19 +12,101 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
+  background: transparent;
 }
 
 #display {
-  background: transparent;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 24px;
+  width: 100%;
   min-height: 100vh;
-  font-size: clamp(60px, 12vw, 110px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 25px 2%;
+}
+
+.banner {
+  width: 100%;
+  max-width: 1500px;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 18px;
+  color: white;
+  background: rgba(5, 13, 27, 0.88);
+  border: 3px solid #00dfff;
+  border-radius: 22px;
+  box-shadow:
+    0 0 8px #00dfff,
+    0 0 20px rgba(0, 223, 255, 0.6),
+    inset 0 0 14px rgba(0, 223, 255, 0.15);
+}
+
+.live {
+  flex-shrink: 0;
+  background: #ed1725;
+  color: white;
+  font-size: clamp(13px, 2vw, 25px);
   font-weight: 900;
-  text-shadow: 0 2px 8px #000;
+  font-style: italic;
+  padding: 9px 14px;
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(255, 0, 0, 0.6);
+}
+
+.team {
+  flex: 1;
+  min-width: 0;
+  text-align: center;
+  font-size: clamp(13px, 2.5vw, 30px);
+  font-weight: 800;
+  font-style: italic;
+  text-shadow: 0 0 8px #00cfff;
+  white-space: nowrap;
+}
+
+.score {
+  flex-shrink: 0;
+  width: clamp(42px, 7vw, 90px);
+  height: clamp(42px, 7vw, 70px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #101827;
+  background: white;
+  border: 3px solid #b8f7ff;
+  border-radius: 12px;
+  font-size: clamp(22px, 4vw, 43px);
+  font-weight: 900;
+  box-shadow: 0 0 12px #00dfff;
+}
+
+.crest {
+  flex-shrink: 0;
+  width: clamp(65px, 10vw, 120px);
+  height: clamp(65px, 10vw, 120px);
+  border-radius: 50%;
+  border: 4px solid #00dfff;
+  background: radial-gradient(circle, #087eae, #06172b 75%);
+  box-shadow: 0 0 15px #00dfff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.crest .shuttle {
+  font-size: clamp(22px, 4vw, 42px);
+}
+
+.crest .club {
+  font-size: clamp(8px, 1.2vw, 13px);
+  letter-spacing: 1px;
 }
 
 #control {
@@ -68,9 +150,9 @@ body {
   gap: 15px;
 }
 
-.team { flex: 1; }
+.teamControl { flex: 1; }
 
-.score {
+.controlScore {
   font-size: 65px;
   font-weight: bold;
   margin: 18px 0;
@@ -88,16 +170,9 @@ button {
 .plus { background: #168cff; color: white; }
 .minus { background: #303d50; color: white; }
 
-.reset {
-  margin-top: 35px;
+.reset, .logout {
+  margin-top: 25px;
   font-size: 16px;
-  background: #303d50;
-  color: white;
-}
-
-.logout {
-  margin-top: 15px;
-  font-size: 15px;
   background: #303d50;
   color: white;
 }
@@ -111,40 +186,47 @@ button {
   color: #ff7777;
   font-size: 14px;
 }
+
+@media (max-width: 600px) {
+  #display { padding: 12px 1%; }
+  .banner { gap: 5px; padding: 7px 5px; border-width: 2px; }
+  .live { padding: 7px 8px; }
+  .team { font-size: clamp(10px, 2.6vw, 16px); }
+  .score { border-width: 2px; border-radius: 8px; }
+}
 </style>
 </head>
 
 <body>
 
 <div id="display">
-  <span id="homeDisplay">0</span>
-  <span>:</span>
-  <span id="guestDisplay">0</span>
+  <div class="banner">
+    <div class="live">● LIVE</div>
+
+    <div class="team">SG Brietlingen-Adendorf</div>
+    <div class="score" id="homeDisplay">0</div>
+
+    <div class="crest">
+      <div class="club">SG BRIETLINGEN</div>
+      <div class="shuttle">🏸</div>
+      <div class="club">ADENDORF</div>
+    </div>
+
+    <div class="score" id="guestDisplay">0</div>
+    <div class="team">BSG Wallhöfen/Ihlpohl</div>
+  </div>
 </div>
 
 <div id="control">
-
   <div id="login">
     <h1>Scoreboard Login</h1>
     <p>Bitte melde dich an, um den Spielstand zu steuern.</p>
 
     <form id="loginForm">
-      <input
-        id="email"
-        type="email"
-        placeholder="E-Mail-Adresse"
-        autocomplete="username"
-        required
-      >
-
-      <input
-        id="password"
-        type="password"
-        placeholder="Passwort"
-        autocomplete="current-password"
-        required
-      >
-
+      <input id="email" type="email"
+        placeholder="E-Mail-Adresse" required>
+      <input id="password" type="password"
+        placeholder="Passwort" required>
       <button type="submit">Anmelden</button>
     </form>
 
@@ -152,19 +234,19 @@ button {
   </div>
 
   <div id="controlPanel">
-    <h1>Spielstand steuern</h1>
+    <h1>Mannschaftsspielstand steuern</h1>
 
     <div class="teams">
-      <div class="team">
-        <h3>Heim</h3>
-        <div class="score" id="homeControl">0</div>
+      <div class="teamControl">
+        <h3>SG Brietlingen-Adendorf</h3>
+        <div class="controlScore" id="homeControl">0</div>
         <button class="minus" onclick="changeScore('home',-1)">−</button>
         <button class="plus" onclick="changeScore('home',1)">+</button>
       </div>
 
-      <div class="team">
-        <h3>Gast</h3>
-        <div class="score" id="guestControl">0</div>
+      <div class="teamControl">
+        <h3>BSG Wallhöfen/Ihlpohl</h3>
+        <div class="controlScore" id="guestControl">0</div>
         <button class="minus" onclick="changeScore('guest',-1)">−</button>
         <button class="plus" onclick="changeScore('guest',1)">+</button>
       </div>
@@ -175,7 +257,6 @@ button {
     </button>
 
     <p id="status">Verbunden</p>
-
     <button class="logout" onclick="logout()">Abmelden</button>
   </div>
 </div>
@@ -217,7 +298,6 @@ function updateScore(score) {
 
   document.getElementById("homeDisplay").textContent = home;
   document.getElementById("guestDisplay").textContent = guest;
-
   document.getElementById("homeControl").textContent = home;
   document.getElementById("guestControl").textContent = guest;
 }
@@ -252,9 +332,7 @@ if (isControl) {
       });
 
     } else {
-      if (user) {
-        await auth.signOut();
-      }
+      if (user) await auth.signOut();
 
       login.style.display = "block";
       controlPanel.style.display = "none";
@@ -287,9 +365,7 @@ if (isControl) {
 }
 
 function changeScore(team, amount) {
-  if (!isControl || !auth.currentUser || auth.currentUser.uid !== allowedUID) {
-    return;
-  }
+  if (!isControl || !auth.currentUser || auth.currentUser.uid !== allowedUID) return;
 
   scoreRef.child(team).transaction(current =>
     Math.max(0, (current || 0) + amount)
@@ -297,9 +373,7 @@ function changeScore(team, amount) {
 }
 
 function resetScore() {
-  if (!isControl || !auth.currentUser || auth.currentUser.uid !== allowedUID) {
-    return;
-  }
+  if (!isControl || !auth.currentUser || auth.currentUser.uid !== allowedUID) return;
 
   if (confirm("Spielstand wirklich zurücksetzen?")) {
     scoreRef.set({home: 0, guest: 0});
