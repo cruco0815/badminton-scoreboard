@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#071525">
+<title>SG Brietlingen-Adendorf | Match Center</title>
+<style>
+:root{--cyan:#35c9e8;--cyanlight:#83edff;--navy:#071525;--muted:#a9bacb;--red:#e9273d;--green:#39d69a;--border:rgba(53,201,232,.68)}
+*{box-sizing:border-box}html,body{margin:0;padding:0;width:100%;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:transparent}button,input,select{font-family:inherit}
+#display{width:100%;padding:10px;background:transparent}.broadcast-layout{width:100%;max-width:1600px;margin:auto;display:grid;grid-template-columns:minmax(190px,.82fr) minmax(520px,2.15fr) minmax(190px,.82fr);gap:clamp(10px,1.25vw,20px);align-items:stretch}
+.match-card{position:relative;isolation:isolate;overflow:hidden;min-width:0;display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:112px;padding:13px 14px;color:#fff;text-align:center;background:linear-gradient(145deg,rgba(18,43,64,.98),rgba(5,17,31,.99));border:1.5px solid rgba(53,201,232,.62);border-radius:25px;box-shadow:0 0 12px rgba(53,201,232,.18),inset 0 0 20px rgba(53,201,232,.06)}
+.match-card:before{content:"";position:absolute;inset:0 12% auto;height:2px;background:linear-gradient(90deg,transparent,var(--cyanlight),transparent);box-shadow:0 0 10px var(--cyan)}.match-card:after{content:"";position:absolute;inset:auto 18% 0;height:1px;background:linear-gradient(90deg,transparent,rgba(53,201,232,.55),transparent)}
+.match-label{position:relative;z-index:1;min-width:58px;padding:5px 12px;margin-bottom:10px;border-radius:7px;color:#061727;background:linear-gradient(135deg,#a4f4ff,var(--cyan));font-size:clamp(13px,1.3vw,18px);font-weight:900;letter-spacing:1px;box-shadow:0 0 12px rgba(53,201,232,.25)}.match-players{position:relative;z-index:1;width:100%;display:flex;flex-direction:column;gap:7px}.player-name{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#fff;font-size:clamp(13px,1.25vw,18px);font-weight:800;line-height:1.2;text-shadow:0 2px 5px #0008}.player-name.second{padding-top:7px;border-top:1px solid rgba(53,201,232,.22)}.vs-line{margin:1px 0;color:var(--cyanlight);font-size:10px;font-weight:800;letter-spacing:2px}
+.scoreboard{position:relative;isolation:isolate;display:grid;grid-template-columns:auto minmax(0,1fr) auto minmax(0,1fr) auto;align-items:center;gap:clamp(10px,1.4vw,22px);width:100%;min-width:0;min-height:112px;margin:0;padding:15px 22px;color:#fff;background:linear-gradient(105deg,rgba(4,15,29,.99),rgba(12,35,55,.99),rgba(4,15,29,.99));border:2px solid var(--border);border-radius:32px;overflow:hidden;box-shadow:0 0 12px #35c9e840,0 0 28px #35c9e81f,inset 0 0 20px #35c9e80f}
+.scoreboard:before{content:"";position:absolute;top:0;left:9%;width:82%;height:3px;background:linear-gradient(90deg,transparent,var(--cyan),#fff,var(--cyan),transparent);box-shadow:0 0 12px var(--cyan);z-index:1}.scoreboard:after{content:"";position:absolute;bottom:0;left:18%;width:64%;height:1px;background:linear-gradient(90deg,transparent,#35c9e880,transparent);z-index:1}
+.border-animation{position:absolute;inset:0;width:100%;height:100%;z-index:5;pointer-events:none}.border-animation rect{fill:none;stroke:url(#borderGradient);stroke-width:3;stroke-linecap:round;stroke-dasharray:125 1600;animation:borderTravel 5s linear infinite;filter:drop-shadow(0 0 4px #35c9e8) drop-shadow(0 0 8px #35c9e8)}@keyframes borderTravel{to{stroke-dashoffset:-1725}}
+.live{position:relative;z-index:2;display:flex;align-items:center;gap:8px;padding:8px 12px;color:#fff;background:var(--red);border-radius:7px;font-size:clamp(11px,1.15vw,16px);font-weight:900;letter-spacing:1px;white-space:nowrap}.live-dot{width:9px;height:9px;background:#fff;border-radius:50%;animation:pulse 1.5s infinite}@keyframes pulse{50%{opacity:.4;box-shadow:none}}
+.team{position:relative;z-index:2;min-width:0;padding:8px 3px;color:#fff;font-size:clamp(13px,1.6vw,23px);font-weight:900;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 5px #0008}.team:after{content:"";display:block;width:100%;height:2px;margin-top:7px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.65}
+.score-area{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:clamp(7px,.9vw,13px)}.score{display:flex;align-items:center;justify-content:center;width:clamp(52px,5.5vw,78px);height:clamp(54px,5.5vw,72px);color:#101d2c;background:linear-gradient(145deg,#fff,#e9f4fa);border:1px solid #ffffffeb;border-radius:12px;font-size:clamp(33px,4vw,57px);font-weight:900;line-height:1;font-variant-numeric:tabular-nums;box-shadow:0 4px 10px #0005,inset 0 1px 2px #ffffffcc}.separator{color:var(--cyan);font-size:clamp(26px,3.4vw,43px);font-weight:900;text-shadow:0 0 10px #35c9e859}.score.changed{animation:scorePop .45s ease}@keyframes scorePop{45%{transform:scale(1.12);box-shadow:0 0 18px #35c9e8b3}}
+.racket{position:relative;z-index:2;width:clamp(34px,3.7vw,54px);height:clamp(52px,5vw,72px);filter:drop-shadow(0 0 5px #35c9e8e6) drop-shadow(0 0 12px #35c9e866)}
+@media(max-width:900px){.broadcast-layout{grid-template-columns:minmax(145px,.75fr) minmax(390px,2fr) minmax(145px,.75fr);gap:8px}.match-card{padding:11px 8px;border-radius:19px;min-height:100px}.scoreboard{gap:8px;padding:12px 13px;min-height:100px;border-radius:25px}.live{padding:6px 8px;font-size:10px}.score{width:49px;height:50px;font-size:33px}.racket{width:31px;height:48px}}
+@media(max-width:650px){#display{padding:5px}.broadcast-layout{grid-template-columns:1fr 1fr;gap:7px}.scoreboard{grid-column:1/-1;grid-row:1;gap:7px;padding:11px 9px;min-height:88px;border-radius:20px}.left-match{grid-column:1;grid-row:2}.right-match{grid-column:2;grid-row:2}.match-card{min-height:82px;padding:9px 7px;border-radius:15px}.match-label{margin-bottom:7px;padding:4px 10px;font-size:12px}.player-name{font-size:12px}.player-name.second{padding-top:5px}.live{padding:5px 6px;font-size:9px;gap:5px}.live-dot{width:7px;height:7px}.team{font-size:clamp(10px,2.7vw,14px);white-space:normal;line-height:1.15;padding:3px}.team:after{margin-top:4px}.score{width:clamp(37px,11vw,48px);height:42px;font-size:29px;border-radius:8px}.separator{font-size:24px}.racket{width:23px;height:36px}}
+@media(max-width:360px){.scoreboard{gap:4px;padding:9px 6px}.live{font-size:8px}.score{width:35px;height:38px;font-size:26px}.team{font-size:10px}.racket{width:19px}}
+/* Admin-Oberfläche */
+#control{display:none;min-height:100vh;padding:20px;color:#fff;background:radial-gradient(circle at top,#18344c,#0d1724 65%);text-align:center}.card{width:100%;max-width:760px;margin:22px auto;padding:24px;background:linear-gradient(145deg,#172d43,#102235);border:1px solid #294b66;border-radius:16px;box-shadow:0 8px 30px #0004}.card h1{margin:5px 0 8px}.card p{color:var(--muted)}input,select{display:block;width:100%;padding:13px;margin:9px 0;color:#142233;background:#fff;border:1px solid #9baabb;border-radius:9px;font-size:16px}input:focus,select:focus{outline:2px solid var(--cyan);border-color:var(--cyan)}button{padding:12px 19px;margin:5px;color:#fff;background:linear-gradient(135deg,#1686c9,#0872b4);border:1px solid #ffffff14;border-radius:9px;font-size:16px;font-weight:bold;cursor:pointer;transition:transform .15s,filter .15s}button:hover{filter:brightness(1.13)}button:active{transform:scale(.97)}.minus,.logout{background:#35485d}.reset{background:#a83240}.teams-control{display:flex;gap:15px}.team-control{flex:1;min-width:0;padding:12px 5px;background:#101d2c;border:1px solid #29445c;border-radius:12px}.team-control h3{min-height:38px;font-size:15px}.control-score{margin:15px 0;color:#fff;font-size:48px;font-weight:900;font-variant-numeric:tabular-nums}.section-title{margin:25px 0 10px;color:var(--cyan);text-align:left;font-size:16px;font-weight:bold}#error{color:#ff8c8c}#status{color:var(--muted);font-size:13px}#opponentStatus,#matchStatus{font-size:13px;color:var(--green)}#controlPanel{display:none}.match-editor{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px}.editor-panel{min-width:0;padding:14px;background:#101d2c;border:1px solid #29445c;border-radius:12px;text-align:left}.editor-panel h3{margin:2px 0 10px;color:#fff;text-align:center}.editor-panel label{display:block;margin:10px 0 5px;color:var(--muted);font-size:13px;font-weight:bold}.editor-panel input,.editor-panel select{margin:5px 0}.helper{font-size:12px;color:var(--muted);line-height:1.4}
+@media(max-width:560px){#control{padding:8px}.card{padding:14px;margin:14px auto}.teams-control{gap:8px}.team-control h3{font-size:12px}.control-score{font-size:40px}.match-editor{grid-template-columns:1fr}.editor-panel{padding:12px}button{padding:11px 13px;font-size:15px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+
+/* =====================================================
+   NEUE POSITIONIERUNG: SCORE OBEN, EINZELSPIELE UNTEN
+   Die beiden Spielkarten bleiben fest in den unteren Ecken.
+===================================================== */
+#display {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100vh;
+  min-height: 100vh;
+  padding: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 10;
+}
+.broadcast-layout {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  display: block;
+  pointer-events: none;
+}
+.scoreboard {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(980px, 88vw);
+  max-width: 980px;
+  min-height: 94px;
+  padding: 12px 20px;
+  gap: clamp(9px, 1.2vw, 18px);
+  pointer-events: none;
+}
+.match-card {
+  position: absolute;
+  bottom: 16px;
+  width: clamp(185px, 22vw, 270px);
+  min-height: 104px;
+  padding: 12px 14px;
+  pointer-events: none;
+}
+.left-match {
+  left: 16px;
+  right: auto;
+  top: auto;
+  grid-column: auto;
+  grid-row: auto;
+}
+.right-match {
+  right: 16px;
+  left: auto;
+  top: auto;
+  grid-column: auto;
+  grid-row: auto;
+}
+@media (max-width: 900px) {
+  .scoreboard {
+    width: min(900px, 94vw);
+    min-height: 84px;
+    padding: 10px 13px;
+    gap: 7px;
+  }
+  .match-card {
+    width: clamp(165px, 27vw, 230px);
+    min-height: 92px;
+    bottom: 12px;
+    padding: 10px;
+  }
+  .left-match { left: 12px; }
+  .right-match { right: 12px; }
+}
+@media (max-width: 650px) {
+  #display { padding: 0; }
+  .broadcast-layout { display: block; }
+  .scoreboard {
+    top: 8px;
+    left: 50%;
+    width: calc(100vw - 16px);
+    min-height: 78px;
+    padding: 9px 7px;
+    grid-template-columns: auto minmax(0,1fr) auto minmax(0,1fr) auto;
+    gap: 5px;
+    border-radius: 18px;
+  }
+  .match-card {
+    bottom: 10px;
+    width: calc(50vw - 16px);
+    min-height: 82px;
+    padding: 8px 6px;
+    border-radius: 14px;
+  }
+  .left-match { left: 8px; }
+  .right-match { right: 8px; }
+  .match-label { margin-bottom: 6px; padding: 4px 9px; font-size: 11px; }
+  .player-name { font-size: clamp(10px, 2.8vw, 13px); }
+  .player-name + .player-name { padding-top: 5px; }
+  .vs-line { margin-top: 4px; font-size: 9px; }
+  .live { padding: 4px 5px; font-size: 8px; gap: 4px; }
+  .live-dot { width: 6px; height: 6px; }
+  .team { font-size: clamp(9px, 2.5vw, 13px); padding: 2px; }
+  .score { width: clamp(32px, 9vw, 43px); height: 38px; font-size: clamp(24px, 7vw, 30px); }
+  .separator { font-size: 22px; }
+  .racket { width: 20px; height: 32px; }
+}
+@media (max-width: 360px) {
+  .scoreboard { gap: 3px; padding: 8px 5px; }
+  .live { font-size: 7px; }
+  .score { width: 29px; height: 34px; font-size: 23px; }
+  .team { font-size: 9px; }
+  .match-card { width: calc(50vw - 12px); }
+  .left-match { left: 6px; }
+  .right-match { right: 6px; }
+}
+
+
+/* Feine Broadcast-Ansicht: möglichst wenig Spielfläche verdecken */
+#display, .broadcast-layout {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.scoreboard {
+  top: 12px;
+  width: min(560px, 62vw);
+  min-height: 58px;
+  padding: 6px 12px;
+  gap: 9px;
+  border-width: 1px;
+  border-radius: 15px;
+  box-shadow: 0 2px 10px #0005;
+}
+.live {
+  padding: 4px 6px;
+  gap: 5px;
+  font-size: 9px;
+  letter-spacing: .5px;
+  border-radius: 5px;
+}
+.live-dot { width: 6px; height: 6px; }
+.team {
+  padding: 3px 1px;
+  font-size: clamp(10px, .95vw, 14px);
+}
+.team:after { height: 1px; margin-top: 3px; }
+.score-area { gap: 5px; }
+.score {
+  width: 37px;
+  height: 39px;
+  border-radius: 7px;
+  font-size: 27px;
+}
+.separator { font-size: 22px; }
+.racket { width: 21px; height: 31px; }
+.match-card {
+  bottom: 12px;
+  width: 174px;
+  min-height: 0;
+  padding: 7px 9px;
+  border-width: 1px;
+  border-radius: 12px;
+  background: rgba(5, 17, 31, .78);
+  box-shadow: 0 2px 9px #0005;
+}
+.left-match { left: 12px; right: auto; }
+.right-match { right: 12px; left: auto; }
+.match-label {
+  min-width: 0;
+  margin-bottom: 5px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-size: 10px;
+  letter-spacing: .5px;
+  box-shadow: none;
+}
+.match-players { gap: 3px; }
+.player-name {
+  font-size: 11px;
+  line-height: 1.15;
+  text-shadow: 0 1px 3px #000;
+}
+.player-name.second { padding-top: 4px; }
+.vs-line { margin: 0; font-size: 8px; letter-spacing: 1px; }
+@media (max-width: 650px) {
+  .scoreboard {
+    top: 8px;
+    width: min(480px, 86vw);
+    min-height: 48px;
+    padding: 5px 7px;
+    gap: 4px;
+  }
+  .live { padding: 3px 4px; font-size: 7px; }
+  .live-dot { width: 5px; height: 5px; }
+  .team { font-size: clamp(8px, 2vw, 11px); }
+  .score { width: 29px; height: 31px; font-size: 21px; }
+  .separator { font-size: 17px; }
+  .racket { width: 15px; height: 23px; }
+  .match-card { bottom: 8px; width:  min(150px, 34vw); padding: 6px; }
+  .left-match { left: 8px; }
+  .right-match { right: 8px; }
+  .match-label { font-size: 9px; margin-bottom: 4px; }
+  .player-name { font-size: clamp(9px, 2.3vw, 11px); }
+}
+
+
+/* Alle drei Anzeigen kompakt in einer gemeinsamen oberen Leiste */
+#display {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 10px 14px;
+  overflow: hidden;
+  pointer-events: none;
+}
+.broadcast-layout {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(135px, 180px) minmax(300px, 560px) minmax(135px, 180px);
+  align-items: start;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  max-width: 940px;
+  height: auto;
+  min-height: 0;
+  margin: 0 auto;
+  padding: 0;
+  pointer-events: none;
+}
+.scoreboard {
+  position: relative;
+  inset: auto;
+  left: auto;
+  top: auto;
+  transform: none;
+  grid-column: 2;
+  grid-row: 1;
+  width: 100%;
+  max-width: none;
+  min-height: 58px;
+  padding: 6px 11px;
+  gap: 8px;
+  border-width: 1px;
+  border-radius: 13px;
+  box-shadow: 0 2px 9px #0005;
+}
+.left-match, .right-match {
+  position: relative;
+  inset: auto;
+  grid-row: 1;
+  width: 100%;
+  min-height: 58px;
+  padding: 6px 8px;
+  border-width: 1px;
+  border-radius: 11px;
+  background: rgba(5, 17, 31, .78);
+  box-shadow: 0 2px 9px #0005;
+}
+.left-match { grid-column: 1; }
+.right-match { grid-column: 3; }
+.match-label {
+  min-width: 0;
+  margin-bottom: 4px;
+  padding: 2px 7px;
+  font-size: 9px;
+  letter-spacing: .5px;
+  border-radius: 5px;
+  box-shadow: none;
+}
+.match-players { gap: 2px; }
+.player-name { font-size: 10px; line-height: 1.1; }
+.player-name.second { padding-top: 3px; }
+.vs-line { margin: 0; font-size: 7px; letter-spacing: .8px; }
+.live { padding: 3px 5px; font-size: 8px; gap: 4px; }
+.live-dot { width: 5px; height: 5px; }
+.team { padding: 2px 1px; font-size: clamp(9px, .85vw, 12px); }
+.team:after { height: 1px; margin-top: 2px; }
+.score-area { gap: 4px; }
+.score { width: 34px; height: 36px; font-size: 24px; border-radius: 6px; }
+.separator { font-size: 19px; }
+.racket { width: 18px; height: 27px; }
+@media (max-width: 650px) {
+  #display { padding: 7px 6px; }
+  .broadcast-layout {
+    grid-template-columns: minmax(84px, 1fr) minmax(160px, 2.1fr) minmax(84px, 1fr);
+    gap: 5px;
+  }
+  .scoreboard {
+    min-height: 48px;
+    padding: 5px 5px;
+    gap: 3px;
+    border-radius: 9px;
+  }
+  .left-match, .right-match {
+    min-height: 48px;
+    padding: 5px 4px;
+    border-radius: 8px;
+  }
+  .match-label { margin-bottom: 3px; padding: 2px 5px; font-size: 8px; }
+  .player-name { font-size: clamp(7px, 1.8vw, 9px); }
+  .vs-line { font-size: 6px; }
+  .live { padding: 2px 3px; font-size: 6px; }
+  .live-dot { width: 4px; height: 4px; }
+  .team { font-size: clamp(7px, 1.7vw, 9px); }
+  .score { width: clamp(21px, 5.2vw, 28px); height: 28px; font-size: 19px; }
+  .separator { font-size: 14px; }
+  .racket { width: 12px; height: 19px; }
+}
+@media (max-width: 360px) {
+  #display { padding: 5px 3px; }
+  .broadcast-layout { gap: 3px; }
+  .scoreboard { padding: 4px 3px; }
+  .left-match, .right-match { padding: 4px 3px; }
+  .score { width: 19px; height: 25px; font-size: 17px; }
+  .team { font-size: 7px; }
+}
+
+</style>
+
+<style>
+#control{min-height:100vh;padding:18px;background:#071321;color:#edf5ff;font-family:Inter,Arial,sans-serif}#control .dashboard{max-width:1180px!important;margin:0 auto!important;padding:0!important;overflow:hidden;background:#0d1b2c!important;border:1px solid #203650!important;border-radius:24px!important;box-shadow:0 24px 80px #0005!important;color:#edf5ff}
+.dash-top{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:25px 30px;border-bottom:1px solid #203650;background:linear-gradient(110deg,#10263d,#0d1b2c)}.dash-top h1{margin:5px 0;font-size:clamp(25px,4vw,34px);color:#f5f9ff;text-shadow:none}.eyebrow{font-size:10px;font-weight:900;letter-spacing:2px;color:#79b9ee}.subline,.page-heading p{margin:5px 0 0;color:#9bb0c8;font-size:13px}.live-pill{padding:8px 12px;border:1px solid #285b55;border-radius:30px;color:#9cebd0;font-size:10px;font-weight:800;letter-spacing:1px;white-space:nowrap}.live-pill span,.status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#49d5a4;margin-right:6px;box-shadow:0 0 10px #49d5a477}.dash-layout{display:grid;grid-template-columns:220px minmax(0,1fr);min-height:650px}.dash-nav{padding:20px 13px;border-right:1px solid #203650;background:#0a1726}.nav-item{display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;margin:3px 0;border:0;border-radius:11px;background:transparent;color:#a9bdd3;text-align:left;font-size:17px}.nav-item span{font-size:13px;font-weight:700}.nav-item.active{background:#183653;color:#dff3ff;box-shadow:inset 3px 0 #64b8f3}.dash-content{padding:28px;min-width:0}.dash-page{display:none}.dash-page.active{display:block;animation:fadeIn .18s ease}@keyframes fadeIn{from{opacity:.55;transform:translateY(4px)}to{opacity:1;transform:none}}.page-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}.page-heading h2{margin:5px 0;color:#f5f9ff;font-size:25px}.overview-grid,.score-editor{display:grid;grid-template-columns:1fr 1fr;gap:14px}.stat-card,.score-team{padding:20px;border:1px solid #28435e;border-radius:17px;background:linear-gradient(145deg,#142a40,#102034)}.stat-label{display:block;color:#80bce9;font-size:10px;font-weight:900;letter-spacing:1.5px}.big-score{display:block;margin:8px 0;font-size:50px;line-height:1;color:#fff}.stat-card>span:last-child{color:#a9bdd3;font-size:12px}.quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:15px 0}.action-tile{display:grid;grid-template-columns:42px 1fr;grid-template-rows:auto auto;align-items:center;gap:2px 12px;padding:15px;border:1px solid #28435e;border-radius:14px;background:#10243a;color:#edf5ff;text-align:left}.action-tile b{grid-row:span 2;display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:#1b3b5a;color:#91cefa;font-size:22px}.action-tile span{font-weight:800}.action-tile small{color:#8fa7c1}.info-panel{display:flex;justify-content:space-between;align-items:center;padding:17px 18px;border:1px solid #28435e;border-radius:14px;background:#0b1a2a}.info-panel p,.muted{margin:5px 0 0;color:#91a7c0;font-size:12px}.score-team{text-align:center}.score-team h3{min-height:35px;margin:10px 0;color:#eaf4ff;font-size:14px}.score-team>strong{display:block;margin:12px 0;font-size:56px;color:#fff}.score-buttons{display:flex;justify-content:center;gap:10px}.score-buttons button{width:58px;height:48px;margin:0;border:1px solid #36536e;border-radius:12px;font-size:26px}.score-minus{background:#26374b;color:#dbe8f5}.score-plus{background:#1c6598;color:#fff}.field-card{margin-top:17px;padding:17px;border:1px solid #28435e;border-radius:14px;background:#0b1a2a}.field-card label,.editor-panel label{display:block;margin:0 0 8px;color:#b7cbe0;font-size:12px;font-weight:700}.inline-field{display:flex;gap:8px}.inline-field input{flex:1;min-width:0}.dashboard input,.dashboard select{width:100%;padding:12px;border:1px solid #2b4965;border-radius:10px;background:#081625;color:#f1f7ff;font-size:14px}.dashboard button{cursor:pointer}.inline-field button,.wide-primary{padding:11px 16px;border:0;border-radius:10px;background:#267db4;color:white;font-weight:800;white-space:nowrap}.feedback{min-height:14px;margin:8px 0 0;color:#85d7b9;font-size:12px}.button-row{margin-top:14px}.soft-button{padding:11px 15px;border:1px solid #3b536b;border-radius:10px;background:#1b2e43;color:#d8e7f7;font-weight:700}.match-editor{display:grid;grid-template-columns:1fr 1fr;gap:14px}.editor-panel{padding:17px;border:1px solid #28435e;border-radius:14px;background:#0b1a2a}.editor-panel h3{margin:0 0 14px;color:#eaf4ff}.editor-panel input,.editor-panel select{margin-bottom:12px}.wide-primary{width:100%;margin-top:12px}.scene-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.scene-button{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:7px;min-height:112px;padding:17px;border:1px solid #315879;border-radius:15px;background:linear-gradient(140deg,#173957,#10243a);color:#f2f8ff;text-align:left}.scene-button>span{color:#8bc8f2;font-size:11px;font-weight:900;letter-spacing:1px}.scene-button b{font-size:15px}.scene-button small{color:#a5bad0}.scene-button.scene-off{border-color:#3d4b5c;background:#182638}.music-card{display:flex;justify-content:space-between;align-items:center;gap:16px}.music-actions{display:flex;gap:8px}.music-actions button{padding:10px 13px;border:0;border-radius:10px;font-weight:800;white-space:nowrap}.music-on{background:#237b70;color:white}.music-off{background:#27384c;color:#e3edf8}.helper-note{color:#8198b2;font-size:11px;line-height:1.5}.logout{margin-top:18px;padding:11px 16px;border:1px solid #754653;border-radius:10px;background:#392431;color:#ffdce2;font-weight:800}
+@media(max-width:760px){#control{padding:8px}.dash-top{padding:20px 17px}.dash-layout{grid-template-columns:1fr}.dash-nav{display:flex;gap:5px;overflow-x:auto;padding:9px;border-right:0;border-bottom:1px solid #203650}.nav-item{flex:0 0 auto;width:auto;padding:10px 12px;gap:7px}.nav-item span{font-size:11px}.dash-content{padding:19px 13px}.overview-grid,.score-editor,.match-editor{gap:9px}.stat-card,.score-team{padding:14px}.big-score{font-size:42px}.score-team>strong{font-size:48px}.score-buttons button{width:48px}.quick-actions{gap:8px}.action-tile{padding:11px;grid-template-columns:34px 1fr;gap:2px 8px}.action-tile b{width:32px;height:32px}.scene-grid{gap:8px}.scene-button{min-height:105px;padding:13px}.inline-field{flex-direction:column}.inline-field button{width:100%}.music-card{align-items:flex-start;flex-direction:column}.music-actions{width:100%}.music-actions button{flex:1}.dash-top .live-pill{font-size:9px;padding:7px 9px}}
+</style>
+
+</head>
+<body>
+<div id="display"><div class="broadcast-layout">
+  <section class="match-card left-match" aria-label="Linkes Einzelspiel"><div class="match-label" id="leftDisciplineDisplay">HE1</div><div class="match-players"><div class="player-name" id="leftPlayer1Display">Spieler 1</div><div class="vs-line">GEGEN</div><div class="player-name second" id="leftPlayer2Display">Spieler 2</div></div></section>
+  <div class="scoreboard">
+    <svg class="border-animation" viewBox="0 0 1000 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs><linearGradient id="borderGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#35c9e8"/><stop offset="50%" stop-color="#fff"/><stop offset="100%" stop-color="#35c9e8"/></linearGradient></defs><rect x="2" y="2" width="996" height="116" rx="30" ry="30"/></svg>
+    <div class="live"><span class="live-dot"></span>LIVE</div><div class="team home-team">SG Brietlingen-Adendorf</div>
+    <div class="score-area"><div class="score" id="homeDisplay">0</div><div class="separator">:</div><div class="score" id="guestDisplay">0</div></div>
+    <div class="team guest-team" id="opponentDisplay">Gegner</div>
+    <svg class="racket" viewBox="0 0 100 150" xmlns="http://www.w3.org/2000/svg" fill="none" aria-label="Neon-Badmintonschläger" role="img"><defs><linearGradient id="neonFrame" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fff"/><stop offset="50%" stop-color="#35c9e8"/><stop offset="100%" stop-color="#087da9"/></linearGradient><filter id="neonGlow"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g transform="rotate(35 50 48)" filter="url(#neonGlow)"><ellipse cx="50" cy="43" rx="27" ry="37" stroke="url(#neonFrame)" stroke-width="4.5"/><g stroke="#a8f4ff" stroke-width="1.2" opacity=".9"><path d="M35 12L35 74M42 8L42 78M50 6L50 80M58 8L58 78M65 12L65 74M25 25L75 25M23 35L77 35M22 45L78 45M24 55L76 55M28 65L72 65"/></g></g><path d="M50 79L50 119" stroke="#35c9e8" stroke-width="5" stroke-linecap="round"/><path d="M50 117L50 144" stroke="#fff" stroke-width="8" stroke-linecap="round"/><path d="M46 121L54 125M46 129L54 133M46 137L54 141" stroke="#35c9e8" stroke-width="2"/></svg>
+  </div>
+  <section class="match-card right-match" aria-label="Rechtes Einzelspiel"><div class="match-label" id="rightDisciplineDisplay">MX</div><div class="match-players"><div class="player-name" id="rightPlayer1Display">Spieler 1</div><div class="vs-line">GEGEN</div><div class="player-name second" id="rightPlayer2Display">Spieler 2</div></div></section>
+</div></div>
+<div id="control">
+  <div id="login" class="card"><h1>🏸 Scoreboard Login</h1><p>SG Brietlingen-Adendorf</p><form id="loginForm"><input id="email" type="email" placeholder="E-Mail-Adresse" autocomplete="username" required><input id="password" type="password" placeholder="Passwort" autocomplete="current-password" required><button type="submit">Anmelden</button></form><p id="error"></p></div>
+  <div id="controlPanel" class="card dashboard" style="display:none">
+    <header class="dash-top"><div><div class="eyebrow">SG BRIETLINGEN-ADENDORF</div><h1>Match Center</h1><p class="subline">Alle Spielstands- und Stream-Funktionen an einem Ort</p></div><div class="live-pill"><span></span> VERBUNDEN</div></header>
+    <div class="dash-layout">
+      <nav class="dash-nav" aria-label="Bereiche">
+        <button class="nav-item active" data-page="overview" onclick="showPage('overview')">⌂ <span>Übersicht</span></button>
+        <button class="nav-item" data-page="score" onclick="showPage('score')">＋ <span>Spielstand</span></button>
+        <button class="nav-item" data-page="lineup" onclick="showPage('lineup')">♟ <span>Aufstellung</span></button>
+        <button class="nav-item" data-page="stream" onclick="showPage('stream')">▣ <span>Stream & Overlays</span></button>
+        <button class="nav-item" data-page="workflow" onclick="showPage('workflow')">⇄ <span>Ablaufplan</span></button>
+        <button class="nav-item" data-page="settings" onclick="showPage('settings')">⚙ <span>Einstellungen</span></button>
+      </nav>
+      <div class="dash-content">
+        <section class="dash-page active" id="page-overview">
+          <div class="page-heading"><div><div class="eyebrow">LIVE CONTROL</div><h2>Übersicht</h2><p>Das Wichtigste für deinen Spieltag.</p></div></div>
+          <div class="overview-grid">
+            <article class="stat-card"><span class="stat-label">HEIMSPIEL</span><strong id="homeControl" class="big-score">0</strong><span>SG Brietlingen-Adendorf</span></article>
+            <article class="stat-card"><span class="stat-label">GAST</span><strong id="guestControl" class="big-score">0</strong><span id="opponentControlName">Gegner</span></article>
+          </div>
+          <div class="quick-actions"><button class="action-tile" onclick="showPage('score')"><b>＋</b><span>Punkte verwalten</span><small>Spielstand ändern</small></button><button class="action-tile" onclick="showPage('stream')"><b>▣</b><span>Stream steuern</span><small>Start, Pause, Ende</small></button></div>
+          <div class="info-panel"><div><b>Aktueller Stream-Status</b><p id="sceneStatus">Wird geladen …</p></div><span class="status-dot" id="sceneDot"></span></div>
+        </section>
+        <section class="dash-page" id="page-score">
+          <div class="page-heading"><div><div class="eyebrow">LIVE SCORE</div><h2>Spielstand</h2><p>Punkte direkt auf der Anzeigetafel aktualisieren.</p></div></div>
+          <div class="score-editor">
+            <article class="score-team"><span class="stat-label">HEIM</span><h3>SG Brietlingen-Adendorf</h3><strong id="homeControlLarge">0</strong><div class="score-buttons"><button class="score-minus" onclick="changeScore('home',-1)">−</button><button class="score-plus" onclick="changeScore('home',1)">+</button></div></article>
+            <article class="score-team"><span class="stat-label">GAST</span><h3 id="opponentLarge">Gegner</h3><strong id="guestControlLarge">0</strong><div class="score-buttons"><button class="score-minus" onclick="changeScore('guest',-1)">−</button><button class="score-plus" onclick="changeScore('guest',1)">+</button></div></article>
+          </div>
+          <div class="field-card"><label for="opponentInput">Gegnerische Mannschaft</label><div class="inline-field"><input id="opponentInput" type="text" maxlength="60" placeholder="Name der gegnerischen Mannschaft"><button onclick="saveOpponent()">Speichern</button></div><p id="opponentStatus" class="feedback"></p></div>
+          <div class="button-row"><button class="soft-button" onclick="resetScore()">Spielstand auf 0:0 setzen</button></div>
+        </section>
+        <section class="dash-page" id="page-lineup">
+          <div class="page-heading"><div><div class="eyebrow">MATCH DETAILS</div><h2>Aufstellung</h2><p>Die beiden Spiele neben der Scoreboard-Leiste bearbeiten.</p></div></div>
+          <div class="match-editor">
+            <section class="editor-panel"><h3>Linkes Spiel</h3><label for="leftDisciplineInput">Disziplin</label><select id="leftDisciplineInput"><option>HE1</option><option>HE2</option><option>HE3</option><option>HD1</option><option>HD2</option><option>DD</option><option>DE</option><option>MX</option></select><label for="leftPlayer1Input">Spieler 1</label><input id="leftPlayer1Input" maxlength="35" placeholder="Name Spieler 1"><label for="leftPlayer2Input">Spieler 2</label><input id="leftPlayer2Input" maxlength="35" placeholder="Name Spieler 2"></section>
+            <section class="editor-panel"><h3>Rechtes Spiel</h3><label for="rightDisciplineInput">Disziplin</label><select id="rightDisciplineInput"><option>HE1</option><option>HE2</option><option>HE3</option><option>HD1</option><option>HD2</option><option>DD</option><option>DE</option><option>MX</option></select><label for="rightPlayer1Input">Spieler 1</label><input id="rightPlayer1Input" maxlength="35" placeholder="Name Spieler 1"><label for="rightPlayer2Input">Spieler 2</label><input id="rightPlayer2Input" maxlength="35" placeholder="Name Spieler 2"></section>
+          </div><button class="wide-primary" onclick="saveMatches()">Aufstellung speichern</button><p id="matchStatus" class="feedback"></p>
+        </section>
+        <section class="dash-page" id="page-stream">
+          <div class="page-heading"><div><div class="eyebrow">BROADCAST CONTROL</div><h2>Stream & Overlays</h2><p>Einblendungen für PRISM Live Studio steuern.</p></div></div>
+          <div class="scene-grid"><button class="scene-button" onclick="setScene('start')"><span>01</span><b>Stream-Start</b><small>„Es geht gleich los“</small></button><button class="scene-button" onclick="setScene('break')"><span>02</span><b>Pause / Break</b><small>„Gleich geht’s weiter!“</small></button><button class="scene-button" onclick="setScene('end')"><span>03</span><b>Stream-Ende</b><small>„Vielen Dank!“</small></button><button class="scene-button scene-off" onclick="hideScene()"><span>×</span><b>Overlay ausblenden</b><small>Kamera wieder freigeben</small></button></div>
+          <div class="field-card"><label for="breakMessage">Text während der Pause</label><div class="inline-field"><input id="breakMessage" type="text" maxlength="100" value="Gleich geht’s weiter!"><button onclick="saveBreakMessage()">Text speichern</button></div><p class="feedback" id="breakStatus"></p></div>
+          <div class="field-card countdown-card">
+            <label>Optionaler Countdown für Start, Break und Ende</label>
+            <div class="inline-field" style="align-items:center;flex-wrap:wrap">
+              <label style="display:flex;align-items:center;gap:9px;font-weight:700"><input id="countdownEnabled" type="checkbox" style="width:19px;height:19px;accent-color:#35bde5"> Countdown anzeigen</label>
+              <input id="countdownMinutes" type="number" min="0" max="999" value="1" aria-label="Minuten" style="max-width:110px">
+              <span>Minuten</span>
+              <input id="countdownSeconds" type="number" min="0" max="59" value="0" aria-label="Sekunden" style="max-width:100px">
+              <span>Sekunden</span>
+              <button onclick="saveCountdown()">Einstellungen speichern</button>
+            </div>
+            <p class="muted">Wenn aktiviert, startet der Countdown automatisch beim Einblenden einer Szene. Wenn deaktiviert, wird kein Countdown gezeigt.</p>
+            <p class="feedback" id="countdownStatus"></p>
+          </div>
+          <div class="field-card music-card"><div><label>Stream-Musik</label><p class="muted">Musik läuft unabhängig von den Szenen weiter.</p><p id="musicStatus" class="feedback">Status wird geladen …</p></div><div class="music-actions"><button class="music-on" onclick="setMusic(true)">▶ Starten</button><button class="music-off" onclick="setMusic(false)">■ Stoppen</button></div></div>
+          <p class="helper-note">Der Gegnername wird automatisch aus dem Spielstand übernommen. Overlay und Musik werden weiterhin mit deiner bestehenden PRISM-Anzeige synchronisiert.</p>
+        </section>
+        <section class="dash-page" id="page-workflow">
+          <div class="page-heading"><div><div class="eyebrow">OPTIONAL</div><h2>Intro & Automatik</h2><p>Nur einschalten, was du wirklich nutzen möchtest.</p></div></div>
+          <div class="field-card">
+            <label for="introVideoUrl">Dein Intro-Video</label>
+            <input id="introVideoUrl" type="text" value="intro.mov" placeholder="intro.mov">
+            <p class="helper-note">Dateiname oder direkte Video-URL. Die Datei muss online neben index.html liegen, damit das Stream-Overlay sie laden kann.</p>
+          </div>
+          <div class="field-card">
+            <label style="display:flex;align-items:center;gap:10px"><input id="workflowEnabled" type="checkbox" style="width:19px;height:19px;accent-color:#35bde5"> <b>Automatik einschalten</b></label>
+            <p class="muted">Ausgeschaltet = du steuerst alle Szenen wie bisher manuell.</p>
+          </div>
+          <div class="editor-panel" style="margin-top:15px">
+            <h3>Was soll nach dem Intro passieren?</h3>
+            <p class="muted">Wähle die Szene, die nach dem Video automatisch erscheinen soll. „Nichts“ bedeutet: Du entscheidest selbst.</p>
+            <label for="startNext">Nach Intro bei Start</label><select id="startNext"><option value="none">Nichts – ich entscheide selbst</option><option value="live">Live-Spielstand</option><option value="start">Start-Overlay</option><option value="break">Break-Overlay</option><option value="end">End-Overlay</option></select>
+            <label for="breakNext" style="margin-top:14px">Nach Intro bei Break</label><select id="breakNext"><option value="none">Nichts – ich entscheide selbst</option><option value="live">Live-Spielstand</option><option value="start">Start-Overlay</option><option value="break">Break-Overlay</option><option value="end">End-Overlay</option></select>
+            <label for="endNext" style="margin-top:14px">Nach Intro bei Ende</label><select id="endNext"><option value="none">Nichts – ich entscheide selbst</option><option value="live">Live-Spielstand</option><option value="start">Start-Overlay</option><option value="break">Break-Overlay</option><option value="end">End-Overlay</option></select>
+          </div>
+          <div class="editor-panel" style="margin-top:15px">
+            <h3>Intro automatisch starten</h3>
+            <p class="muted">Für jede Szene einzeln festlegen. Der Countdown wird in der Stream-Steuerung eingestellt.</p>
+            <label><input id="startIntroBefore" type="checkbox" style="width:18px"> Vor dem Start-Overlay</label>
+            <label><input id="startIntroAfter" type="checkbox" style="width:18px"> Nach dem Start-Countdown (wenn aktiviert)</label>
+            <label><input id="breakIntroBefore" type="checkbox" style="width:18px"> Vor dem Break-Overlay</label>
+            <label><input id="breakIntroAfter" type="checkbox" style="width:18px"> Nach dem Break-Countdown (wenn aktiviert)</label>
+            <label><input id="endIntroBefore" type="checkbox" style="width:18px"> Vor dem End-Overlay</label>
+            <label><input id="endIntroAfter" type="checkbox" style="width:18px"> Nach dem End-Countdown (wenn aktiviert)</label>
+          </div>
+          <div class="field-card" style="margin-top:15px">
+            <b>Speichern</b>
+            <p class="muted">Alle Optionen sind freiwillig. Du kannst die Automatik jederzeit ausschalten.</p>
+            <p class="feedback" id="workflowStatus"></p>
+            <button class="wide-primary" onclick="saveWorkflow()">Einstellungen speichern</button>
+          </div>
+        </section>
+        <section class="dash-page" id="page-settings">
+          <div class="page-heading"><div><div class="eyebrow">ACCOUNT</div><h2>Einstellungen</h2><p>Verbindung und Zugang verwalten.</p></div></div>
+          <div class="info-panel"><div><b>Firebase-Verbindung</b><p id="status">Verbinde mit Firebase …</p></div><span class="status-dot"></span></div>
+          <div class="field-card"><b>Angemeldet bleiben</b><p class="muted">Dein Login wird lokal gespeichert. Auf gemeinsam genutzten Geräten bitte abmelden.</p></div>
+          <button class="logout" onclick="logout()">Abmelden</button>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script><script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig={apiKey:"AIzaSyDhYBRhGo3jlKSjullTBQaprgaoSPA7dXk",authDomain:"badminton-scoreboard-5c4b4.firebaseapp.com",databaseURL:"https://badminton-scoreboard-5c4b4-default-rtdb.europe-west1.firebasedatabase.app",projectId:"badminton-scoreboard-5c4b4",storageBucket:"badminton-scoreboard-5c4b4.firebasestorage.app",messagingSenderId:"257689447899",appId:"1:257689447899:web:37fd7d47ff7c5e0eae4bfe"};
+const allowedUID="NWl3lBL8XEZBiQKniVsIXiKsHB73";firebase.initializeApp(firebaseConfig);const auth=firebase.auth();const persistenceReady=auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);const database=firebase.database();const scoreRef=database.ref("matches/badminton1");const isControl=new URLSearchParams(location.search).get("control")==="1";const display=document.getElementById("display"),control=document.getElementById("control"),login=document.getElementById("login"),controlPanel=document.getElementById("controlPanel");
+const defaultData={home:0,guest:0,opponent:"Gegner",leftDiscipline:"HE1",leftPlayer1:"Spieler 1",leftPlayer2:"Spieler 2",rightDiscipline:"MX",rightPlayer1:"Spieler 1",rightPlayer2:"Spieler 2"};const allowedDisciplines=["HE1","HE2","HE3","HD1","HD2","DD","DE","MX"];
+function safeText(v,f){const s=String(v??"").trim();return s||f}function setText(id,v){const e=document.getElementById(id);if(e)e.textContent=v}function updateNumber(id,v){const e=document.getElementById(id);if(!e)return;const n=String(v);if(e.textContent!==n){e.textContent=n;e.classList.remove("changed");void e.offsetWidth;e.classList.add("changed")}}function setInputIfNotFocused(id,v){const e=document.getElementById(id);if(e&&document.activeElement!==e)e.value=v}
+function updateScore(data){const home=Math.max(0,Number(data.home??0)||0),guest=Math.max(0,Number(data.guest??0)||0),opponent=safeText(data.opponent,"Gegner");updateNumber("homeDisplay",home);updateNumber("guestDisplay",guest);setText("homeControl",home);setText("guestControl",guest);setText("homeControlLarge",home);setText("guestControlLarge",guest);setText("opponentLarge",opponent);setText("opponentDisplay",opponent);setText("opponentControlName",opponent);setInputIfNotFocused("opponentInput",opponent);
+const ld=allowedDisciplines.includes(data.leftDiscipline)?data.leftDiscipline:"HE1",rd=allowedDisciplines.includes(data.rightDiscipline)?data.rightDiscipline:"MX";const lp1=safeText(data.leftPlayer1,"Spieler 1"),lp2=safeText(data.leftPlayer2,"Spieler 2"),rp1=safeText(data.rightPlayer1,"Spieler 1"),rp2=safeText(data.rightPlayer2,"Spieler 2");setText("leftDisciplineDisplay",ld);setText("leftPlayer1Display",lp1);setText("leftPlayer2Display",lp2);setText("rightDisciplineDisplay",rd);setText("rightPlayer1Display",rp1);setText("rightPlayer2Display",rp2);setInputIfNotFocused("leftDisciplineInput",ld);setInputIfNotFocused("leftPlayer1Input",lp1==="Spieler 1"?"":lp1);setInputIfNotFocused("leftPlayer2Input",lp2==="Spieler 2"?"":lp2);setInputIfNotFocused("rightDisciplineInput",rd);setInputIfNotFocused("rightPlayer1Input",rp1==="Spieler 1"?"":rp1);setInputIfNotFocused("rightPlayer2Input",rp2==="Spieler 2"?"":rp2)}
+if(!isControl){display.style.display="block";scoreRef.on("value",s=>updateScore(s.val()||defaultData),e=>console.error("Firebase Fehler:",e))}
+if(isControl){display.style.display="none";control.style.display="block";persistenceReady.then(()=>auth.onAuthStateChanged(async user=>{if(user&&user.uid===allowedUID){login.style.display="none";controlPanel.style.display="block";const status=document.getElementById("status");status.textContent="Verbunden mit Firebase";try{const snap=await scoreRef.once("value");if(!snap.exists())await scoreRef.set(defaultData);else{const old=snap.val()||{},missing={};Object.keys(defaultData).forEach(k=>{if(old[k]===undefined)missing[k]=defaultData[k]});if(Object.keys(missing).length)await scoreRef.update(missing)}scoreRef.off("value");scoreRef.on("value",s=>updateScore(s.val()||defaultData),e=>status.textContent="Datenbankfehler: "+e.message)}catch(e){status.textContent="Fehler: "+e.message}}else{if(user)await auth.signOut();login.style.display="block";controlPanel.style.display="none"}}));document.getElementById("loginForm").addEventListener("submit",async e=>{e.preventDefault();const out=document.getElementById("error");out.textContent="Anmeldung läuft ...";try{await persistenceReady;const r=await auth.signInWithEmailAndPassword(document.getElementById("email").value,document.getElementById("password").value);if(r.user.uid!==allowedUID){await auth.signOut();throw new Error("Kein Zugriff auf die Steuerung.")}out.textContent=""}catch(err){out.textContent="Anmeldung fehlgeschlagen: "+err.message}})}
+function authorized(){return isControl&&auth.currentUser&&auth.currentUser.uid===allowedUID}function changeScore(team,amount){if(!authorized()||(team!=="home"&&team!=="guest"))return;scoreRef.child(team).transaction(v=>Math.max(0,(Number(v)||0)+amount))}
+async function saveOpponent(){if(!authorized())return;const value=document.getElementById("opponentInput").value.trim(),status=document.getElementById("opponentStatus");if(!value){status.textContent="Bitte einen Mannschaftsnamen eingeben.";return}try{await scoreRef.child("opponent").set(value);status.textContent="✓ Gegnername erfolgreich gespeichert."}catch(e){status.textContent="Fehler: "+e.message}}
+async function saveMatches(){if(!authorized())return;const status=document.getElementById("matchStatus"),left=document.getElementById("leftDisciplineInput").value,right=document.getElementById("rightDisciplineInput").value;if(!allowedDisciplines.includes(left)||!allowedDisciplines.includes(right)){status.textContent="Bitte eine gültige Disziplin auswählen.";return}const updates={leftDiscipline:left,leftPlayer1:document.getElementById("leftPlayer1Input").value.trim()||"Spieler 1",leftPlayer2:document.getElementById("leftPlayer2Input").value.trim()||"Spieler 2",rightDiscipline:right,rightPlayer1:document.getElementById("rightPlayer1Input").value.trim()||"Spieler 1",rightPlayer2:document.getElementById("rightPlayer2Input").value.trim()||"Spieler 2"};try{await scoreRef.update(updates);status.textContent="✓ Beide Spiele wurden gespeichert."}catch(e){status.textContent="Fehler beim Speichern: "+e.message}}
+function resetScore(){if(!authorized())return;if(!confirm("Möchtest du den Spielstand wirklich auf 0:0 zurücksetzen?"))return;scoreRef.update({home:0,guest:0})}function logout(){if(!isControl)return;scoreRef.off("value");auth.signOut()}
+
+const overlayRef=database.ref("matches/badminton1/breakOverlay");
+const workflowRef=database.ref("matches/badminton1/workflow");
+function workflowValue(){
+  const get = id => document.getElementById(id);
+  const enabled = get("workflowEnabled");
+  const url = get("introVideoUrl");
+  const v = {
+    enabled: !!(enabled && enabled.checked),
+    introVideoUrl: (url && url.value.trim()) || "intro.mov",
+    scenes: {}
+  };
+  ["start", "break", "end"].forEach(k => {
+    const before = get(k + "IntroBefore");
+    const after = get(k + "IntroAfter");
+    const next = get(k + "Next");
+    v.scenes[k] = {
+      introBefore: !!(before && before.checked),
+      introAfter: !!(after && after.checked),
+      nextAfterIntro: (next && next.value) || "none"
+    };
+  });
+  return v;
+}
+async function saveWorkflow(){if(!authorized())return;try{await workflowRef.set(workflowValue());setText("workflowStatus","✓ Ablaufplan-Einstellungen gespeichert.");}catch(e){setText("workflowStatus","Fehler: "+e.message);}}
+workflowRef.on("value", snap => {
+  const v = snap.val() || {};
+  const scenes = v.scenes || {};
+  const enabled = document.getElementById("workflowEnabled");
+  const url = document.getElementById("introVideoUrl");
+  if (enabled) enabled.checked = !!v.enabled;
+  if (url && document.activeElement !== url) url.value = v.introVideoUrl || "intro.mov";
+  ["start", "break", "end"].forEach(k => {
+    const scene = scenes[k] || {};
+    const before = document.getElementById(k + "IntroBefore");
+    const after = document.getElementById(k + "IntroAfter");
+    const next = document.getElementById(k + "Next");
+    if (before) before.checked = !!scene.introBefore;
+    if (after) after.checked = !!scene.introAfter;
+    if (next) next.value = scene.nextAfterIntro || "none";
+  });
+});
+function showPage(name){document.querySelectorAll(".dash-page").forEach(p=>p.classList.toggle("active",p.id==="page-"+name));document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.page===name));}
+function setScene(mode){if(!authorized())return;const enabled=!!document.getElementById("countdownEnabled")?.checked;const mins=Math.max(0,Math.min(999,parseInt(document.getElementById("countdownMinutes")?.value||"0",10)||0));const secs=Math.max(0,Math.min(59,parseInt(document.getElementById("countdownSeconds")?.value||"0",10)||0));const duration=mins*60+secs;const countdownEndAt=enabled&&duration>0?Date.now()+duration*1000:0;overlayRef.update({active:true,mode:mode,countdownEnabled:enabled,countdownEndAt:countdownEndAt}).then(()=>{const s=document.getElementById("sceneStatus");if(s)s.textContent=mode==="start"?"Stream-Start ist eingeblendet.":mode==="break"?"Pause-Einblendung ist aktiv.":"Stream-Ende ist eingeblendet.";}).catch(e=>{document.getElementById("breakStatus").textContent="Fehler: "+e.message;});}
+function hideScene(){if(!authorized())return;overlayRef.update({active:false}).then(()=>{document.getElementById("sceneStatus").textContent="Overlay ausgeblendet – Kamera sichtbar.";}).catch(e=>{document.getElementById("breakStatus").textContent="Fehler: "+e.message;});}
+function setMusic(on){if(!authorized())return;overlayRef.update({music:!!on}).then(()=>{document.getElementById("musicStatus").textContent=on?"Musikstart gesendet.":"Musik gestoppt.";}).catch(e=>{document.getElementById("musicStatus").textContent="Fehler: "+e.message;});}
+async function saveBreakMessage(){if(!authorized())return;try{await overlayRef.update({message:document.getElementById("breakMessage").value.trim()||"Gleich geht’s weiter!"});document.getElementById("breakStatus").textContent="Pausentext gespeichert.";}catch(e){document.getElementById("breakStatus").textContent="Fehler: "+e.message;}}
+async function saveCountdown(){if(!authorized())return;const enabled=!!document.getElementById("countdownEnabled").checked;const minutes=Math.max(0,Math.min(999,parseInt(document.getElementById("countdownMinutes").value||"0",10)||0));const seconds=Math.max(0,Math.min(59,parseInt(document.getElementById("countdownSeconds").value||"0",10)||0));try{await overlayRef.update({countdownEnabled:enabled,countdownDuration:minutes*60+seconds});document.getElementById("countdownStatus").textContent=enabled?(minutes*60+seconds>0?"Countdown-Einstellung gespeichert.":"Bitte eine Dauer größer 0 einstellen."):"Countdown ist deaktiviert.";}catch(e){document.getElementById("countdownStatus").textContent="Fehler: "+e.message;}}
+overlayRef.on("value",snap=>{const v=snap.val()||{};const scene=v.active?(v.mode==="start"?"Stream-Start":v.mode==="break"?"Pause / Break":v.mode==="end"?"Stream-Ende":"Overlay aktiv"):"Kein Overlay aktiv";const el=document.getElementById("sceneStatus");if(el)el.textContent=scene;const dot=document.getElementById("sceneDot");if(dot)dot.style.background=v.active?"#49d5a4":"#71849a";const ms=document.getElementById("musicStatus");if(ms)ms.textContent=v.music?"Musik ist eingeschaltet.":"Musik ist ausgeschaltet.";const bm=document.getElementById("breakMessage");if(bm&&document.activeElement!==bm)bm.value=v.message||"Gleich geht’s weiter!";const ce=document.getElementById("countdownEnabled"),cm=document.getElementById("countdownMinutes"),cs=document.getElementById("countdownSeconds");if(ce&&document.activeElement!==ce)ce.checked=!!v.countdownEnabled;if(cm&&document.activeElement!==cm)cm.value=Math.floor((v.countdownDuration||60)/60);if(cs&&document.activeElement!==cs)cs.value=(v.countdownDuration||60)%60;});
+
+</script>
+</body></html>
